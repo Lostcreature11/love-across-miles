@@ -138,7 +138,7 @@ const SetupFlow = () => {
                 onClick={() => setPronoun("she")}
                 className={`px-5 py-2 rounded-lg text-sm font-body transition-all ${pronoun === "she" ? "bg-rose text-background" : "bg-input text-foreground hover:bg-rose/30"}`}
               >
-                She / Her 💋👩‍🦰🦋
+                She / Her 🦋💫
               </button>
               <button
                 onClick={() => setPronoun("he")}
