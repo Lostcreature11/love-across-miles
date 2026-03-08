@@ -235,38 +235,60 @@ const LettersSection = () => {
                 </div>
               </div>
 
-              {/* Full letter lists below */}
-              <div className="w-full mb-10">
-                <h3 className="font-display text-lg text-gold-accent mb-4 tracking-wider text-center">💌 Received</h3>
-                {received.length === 0 ? (
-                  <p className="text-center text-muted-foreground font-italic italic text-sm py-6">Your mailbox is empty… send a letter to get one back ♡</p>
+              {/* Clean chronological list */}
+              <div className="w-full space-y-3">
+                {letters.length === 0 ? (
+                  <p className="text-center text-muted-foreground font-italic italic text-sm py-6">No letters yet… write one to get started ♡</p>
                 ) : (
-                  <div className="flex flex-wrap justify-center gap-4">
-                    {received.map((letter, i) => (
-                      <div key={letter.id} className="opacity-0" style={{ animation: `mailboxSpill 0.7s cubic-bezier(.34,1.56,.64,1) ${0.3 + i * 0.12}s forwards` }}>
-                        <MailboxEnvelope letter={letter} isSent={false} onClick={() => handleOpenLetter(letter)} />
+                  letters.map((letter, i) => {
+                    const isMine = letter.sender_id === me?.id;
+                    const isOpened = isMine || letter.opened;
+                    const dateLabel = new Date(letter.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
+                    return (
+                      <div
+                        key={letter.id}
+                        onClick={() => handleOpenLetter(letter)}
+                        className="flex items-center gap-4 px-4 py-3 rounded-lg cursor-pointer transition-all hover:scale-[1.01] opacity-0"
+                        style={{
+                          background: isOpened ? "hsl(var(--card))" : "hsl(var(--rose) / 0.1)",
+                          border: `1px solid ${isOpened ? "hsl(var(--border))" : "hsl(var(--rose) / 0.3)"}`,
+                          animation: `mailboxSpill 0.5s ease-out ${0.1 + i * 0.06}s forwards`,
+                        }}
+                      >
+                        {/* Envelope icon */}
+                        <div className="relative flex-shrink-0 w-10 h-8 rounded-sm overflow-hidden" style={{
+                          background: isOpened ? "#fffdf8" : "#f5d5d5",
+                          border: `1px solid ${isOpened ? "hsl(var(--gold) / 0.5)" : "hsl(var(--rose) / 0.5)"}`,
+                        }}>
+                          <div className="absolute top-0 left-0 w-full" style={{ height: 0, borderLeft: "20px solid transparent", borderRight: "20px solid transparent", borderTop: `10px solid ${isOpened ? "#e8d8c8" : "#e8b8b8"}` }} />
+                          {!isOpened && (
+                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[8px]" style={{ color: "#c04040" }}>♡</div>
+                          )}
+                        </div>
+                        {/* Details */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className="font-display text-sm text-foreground truncate">
+                              {isMine ? `To ${letter.to_name}` : `From ${letter.from_name}`}
+                            </span>
+                            {isMine && (
+                              <span className="text-[10px] px-1.5 py-0.5 rounded-full font-display tracking-wider" style={{ background: "hsl(var(--gold) / 0.15)", color: "hsl(var(--gold))" }}>sent</span>
+                            )}
+                            {!isOpened && (
+                              <span className="w-2 h-2 rounded-full flex-shrink-0 animate-pulse" style={{ background: "#c04040" }} />
+                            )}
+                          </div>
+                          <p className="text-xs text-muted-foreground font-italic italic truncate mt-0.5">
+                            {letter.message.slice(0, 50)}{letter.message.length > 50 ? "…" : ""}
+                          </p>
+                        </div>
+                        {/* Date */}
+                        <span className="text-[10px] text-muted-foreground/60 flex-shrink-0 whitespace-nowrap">{dateLabel}</span>
                       </div>
-                    ))}
-                  </div>
+                    );
+                  })
                 )}
               </div>
-
-              <div className="w-full">
-                <h3 className="font-display text-lg text-gold-accent mb-4 tracking-wider text-center">✉️ Sent</h3>
-                {sent.length === 0 ? (
-                  <p className="text-center text-muted-foreground font-italic italic text-sm py-6">You haven't sent any letters yet ✦</p>
-                ) : (
-                  <div className="flex flex-wrap justify-center gap-4">
-                    {sent.map((letter, i) => (
-                      <div key={letter.id} className="opacity-0" style={{ animation: `mailboxSpill 0.7s cubic-bezier(.34,1.56,.64,1) ${0.3 + i * 0.12}s forwards` }}>
-                        <MailboxEnvelope letter={letter} isSent={true} onClick={() => handleOpenLetter(letter)} />
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-            </div>
           )}
         </div>
       )}
