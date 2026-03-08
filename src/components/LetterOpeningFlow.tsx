@@ -169,29 +169,10 @@ const LetterOpeningFlow = ({ letter, onClose }: Props) => {
           </button>
 
           {/* Stamp-edge letter */}
-          <div className="relative p-8 sm:p-10 rounded" style={{
-            background: "#fffdf8",
-            maskImage: `
-              radial-gradient(circle 6px at 6px 0, transparent 5.5px, #000 6px),
-              radial-gradient(circle 6px at 6px 0, transparent 5.5px, #000 6px),
-              radial-gradient(circle 6px at 0 6px, transparent 5.5px, #000 6px),
-              radial-gradient(circle 6px at 0 6px, transparent 5.5px, #000 6px)
-            `,
-            maskSize: "12px 100%, 12px 100%, 100% 12px, 100% 12px",
-            maskPosition: "left top, right top, top left, bottom left",
-            maskRepeat: "repeat-y, repeat-y, repeat-x, repeat-x",
-            maskComposite: "intersect",
-            WebkitMaskImage: `
-              radial-gradient(circle 6px at 6px 0, transparent 5.5px, #000 6px),
-              radial-gradient(circle 6px at 6px 0, transparent 5.5px, #000 6px),
-              radial-gradient(circle 6px at 0 6px, transparent 5.5px, #000 6px),
-              radial-gradient(circle 6px at 0 6px, transparent 5.5px, #000 6px)
-            `,
-            WebkitMaskSize: "12px 100%, 12px 100%, 100% 12px, 100% 12px",
-            WebkitMaskPosition: "left top, right top, top left, bottom left",
-            WebkitMaskRepeat: "repeat-y, repeat-y, repeat-x, repeat-x",
-            WebkitMaskComposite: "source-in",
-          }}>
+           <div className="relative p-8 sm:p-10 rounded-lg shadow-2xl" style={{
+173:             background: "#fffdf8",
+174:             border: "2px solid #d4a574",
+175:           }}>
             {/* Header */}
             <div className="flex justify-between items-start mb-4">
               <div>
