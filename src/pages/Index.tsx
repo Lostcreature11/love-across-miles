@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { initAudio } from "@/lib/sounds";
 import Starfield from "@/components/Starfield";
 import CustomCursor from "@/components/CustomCursor";
 import Navbar from "@/components/Navbar";
@@ -63,7 +64,7 @@ const IndexContent = () => {
   };
 
   return (
-    <div className="relative min-h-screen bg-background overflow-x-hidden">
+    <div className="relative min-h-screen bg-background overflow-x-hidden" onClick={initAudio} onTouchStart={initAudio}>
       <Starfield />
       <CustomCursor />
       <StarWishOverlay />
