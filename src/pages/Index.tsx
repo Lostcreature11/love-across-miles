@@ -37,7 +37,7 @@ const IndexContent = () => {
   const renderTab = () => {
     switch (activeTab) {
       case "prologue":
-        return <HeroSection />;
+        return <HeroSection onExplore={() => setActiveTab("why-you")} />;
       case "why-you":
         return <WhyYouSection />;
       case "our-diary":
@@ -45,7 +45,7 @@ const IndexContent = () => {
       case "countdown":
         return <CountdownSection />;
       default:
-        return <HeroSection />;
+        return <HeroSection onExplore={() => setActiveTab("why-you")} />;
     }
   };
 
