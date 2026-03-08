@@ -22,6 +22,7 @@ const LettersSection = () => {
   const { roomId, me, partner } = useRoom();
   const { notify } = useNotifications();
   const [view, setView] = useState<"compose" | "inbox">("inbox");
+  const [toName, setToName] = useState(partner?.name || "");
   const [message, setMessage] = useState("");
   const [letters, setLetters] = useState<LoveLetter[]>([]);
   const [loading, setLoading] = useState(true);
@@ -73,19 +74,20 @@ const LettersSection = () => {
   }, [roomId, me]);
 
   const handleSend = async () => {
-    if (!roomId || !me || !partner || message.trim().length < 10) return;
+    if (!roomId || !me || toName.trim().length === 0 || message.trim().length < 10) return;
     setSending(true);
     try {
       const { error } = await supabase.from("love_letters").insert({
         room_id: roomId,
         sender_id: me.id,
-        to_name: partner.name,
+        to_name: toName.trim(),
         from_name: me.name,
         message: message.trim(),
       });
       if (error) throw error;
       toast({ title: "💌 Your letter is on its way…" });
       setMessage("");
+      setToName(partner?.name || "");
       setView("inbox");
     } catch {
       toast({ title: "Error", description: "Failed to send letter", variant: "destructive" });
@@ -135,6 +137,16 @@ const LettersSection = () => {
           <h2 className="font-cursive text-3xl text-rose-accent text-center mb-6" style={{ fontFamily: "'Dancing Script', cursive" }}>
             Write a Love Letter
           </h2>
+          {/* To field */}
+          <div className="mb-4 flex items-center gap-3 px-1">
+            <span className="text-sm uppercase tracking-widest font-display" style={{ color: "#c97070" }}>To:</span>
+            <input
+              value={toName}
+              onChange={(e) => setToName(e.target.value)}
+              placeholder="Their name…"
+              className="flex-1 bg-transparent border-b border-[hsl(39_42%_61%/0.3)] pb-1 text-foreground font-handwriting text-lg focus:outline-none focus:border-[hsl(350_42%_68%/0.6)] placeholder:text-muted-foreground/50 placeholder:italic"
+            />
+          </div>
           <div className="relative rounded-lg overflow-hidden border border-[hsl(39_42%_61%/0.3)]" style={{ background: "#fffdf8" }}>
             <Textarea
               value={message}
@@ -154,17 +166,12 @@ const LettersSection = () => {
             <span className="text-xs text-muted-foreground font-italic italic">{message.length} characters</span>
             <Button
               onClick={handleSend}
-              disabled={sending || message.trim().length < 10}
+              disabled={sending || message.trim().length < 10 || toName.trim().length === 0}
               className="bg-[#c97070] hover:bg-[#b06060] text-white font-display tracking-wider"
             >
               {sending ? "Sending…" : "Send Letter 💌"}
             </Button>
           </div>
-          {!partner && (
-            <p className="text-center text-muted-foreground text-xs mt-4 font-italic italic">
-              Your partner needs to join the room before you can send a letter ♡
-            </p>
-          )}
         </div>
       )}
 
