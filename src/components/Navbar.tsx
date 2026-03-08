@@ -1,7 +1,6 @@
 import { useState } from "react";
 
 const tabs = [
-  { id: "prologue", label: "Prologue", emoji: "✦" },
   { id: "why-you", label: "Why You", emoji: "⭐" },
   { id: "our-diary", label: "Diary", emoji: "📖" },
   { id: "countdown", label: "Countdown", emoji: "⏳" },
