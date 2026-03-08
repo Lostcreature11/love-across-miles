@@ -200,7 +200,7 @@ const DiarySection = () => {
             ))}
             {Array.from({ length: firstDay }).map((_, i) => <div key={`empty-${i}`} />)}
             {Array.from({ length: daysInMonth }, (_, i) => i + 1).map((day) => {
-              const day = i + 1;
+              
               const date = `${currentYear}-${String(currentMonth + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
               const dayEntries = getEntries(date);
               const isToday = date === today;

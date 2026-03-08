@@ -106,8 +106,9 @@ const CountdownSection = () => {
 
   const isNoteUnlocked = (index: number) => {
     if (!meetingDate) return false;
-    const daysSince = Math.floor((Date.now() - new Date(meetingDate + "T00:00:00").getTime()) / 86400000);
-    return daysSince > index;
+    const daysUntil = Math.ceil((new Date(meetingDate + "T00:00:00").getTime() - Date.now()) / 86400000);
+    const totalNotes = LOVE_NOTES.length;
+    return (totalNotes - daysUntil) > index;
   };
 
   const openNote = async (index: number) => {
