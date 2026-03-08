@@ -45,6 +45,8 @@ const IndexContent = () => {
         return <DiarySection />;
       case "countdown":
         return <CountdownSection />;
+      case "letters":
+        return <LettersSection />;
       default:
         return <HeroSection onExplore={() => setActiveTab("why-you")} />;
     }
