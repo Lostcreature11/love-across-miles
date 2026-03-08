@@ -203,8 +203,10 @@ const LettersSection = () => {
                     {received.map((letter, i) => (
                       <div
                         key={letter.id}
-                        className="animate-fade-up"
-                        style={{ animationDelay: `${i * 0.08}s` }}
+                        className="opacity-0"
+                        style={{
+                          animation: `mailboxSpill 0.7s cubic-bezier(.34,1.56,.64,1) ${0.3 + i * 0.12}s forwards`,
+                        }}
                       >
                         <MailboxEnvelope letter={letter} isSent={false} onClick={() => handleOpenLetter(letter)} />
                       </div>
@@ -223,8 +225,10 @@ const LettersSection = () => {
                     {sent.map((letter, i) => (
                       <div
                         key={letter.id}
-                        className="animate-fade-up"
-                        style={{ animationDelay: `${i * 0.08}s` }}
+                        className="opacity-0"
+                        style={{
+                          animation: `mailboxSpill 0.7s cubic-bezier(.34,1.56,.64,1) ${0.3 + i * 0.12}s forwards`,
+                        }}
                       >
                         <MailboxEnvelope letter={letter} isSent={true} onClick={() => handleOpenLetter(letter)} />
                       </div>
