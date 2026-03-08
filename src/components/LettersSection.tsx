@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+import mailboxImg from "@/assets/mailbox.jpg";
 import { useRoom } from "@/contexts/RoomContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
@@ -176,39 +177,62 @@ const LettersSection = () => {
       )}
 
       {view === "inbox" && (
-        <div className="animate-fade-up space-y-8">
+        <div className="animate-fade-up">
           {loading ? (
             <p className="text-center text-gold-accent font-italic italic animate-pulse">Loading… ♡</p>
           ) : (
-            <>
-              {/* Received */}
-              <div>
-                <h3 className="font-display text-lg text-gold-accent mb-4 tracking-wider">💌 Received</h3>
+            <div className="flex flex-col items-center">
+              {/* Mailbox hero */}
+              <div className="relative mb-8">
+                <img src={mailboxImg} alt="Love mailbox" className="w-56 sm:w-64 mx-auto rounded-xl drop-shadow-lg" />
+                {/* Letter count badge */}
+                {received.filter(l => !l.opened).length > 0 && (
+                  <div className="absolute -top-2 -right-2 w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold animate-pulse shadow-lg" style={{ background: "#c04040" }}>
+                    {received.filter(l => !l.opened).length}
+                  </div>
+                )}
+              </div>
+
+              {/* Received letters spilling out of mailbox */}
+              <div className="w-full mb-10">
+                <h3 className="font-display text-lg text-gold-accent mb-4 tracking-wider text-center">💌 Received</h3>
                 {received.length === 0 ? (
-                  <p className="text-center text-muted-foreground font-italic italic text-sm py-8">No letters yet… maybe send one first? ♡</p>
+                  <p className="text-center text-muted-foreground font-italic italic text-sm py-6">Your mailbox is empty… send a letter to get one back ♡</p>
                 ) : (
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                    {received.map((letter) => (
-                      <EnvelopeCard key={letter.id} letter={letter} isSent={false} onClick={() => handleOpenLetter(letter)} />
+                  <div className="flex flex-wrap justify-center gap-4">
+                    {received.map((letter, i) => (
+                      <div
+                        key={letter.id}
+                        className="animate-fade-up"
+                        style={{ animationDelay: `${i * 0.08}s` }}
+                      >
+                        <MailboxEnvelope letter={letter} isSent={false} onClick={() => handleOpenLetter(letter)} />
+                      </div>
                     ))}
                   </div>
                 )}
               </div>
 
               {/* Sent */}
-              <div>
-                <h3 className="font-display text-lg text-gold-accent mb-4 tracking-wider">✉️ Sent</h3>
+              <div className="w-full">
+                <h3 className="font-display text-lg text-gold-accent mb-4 tracking-wider text-center">✉️ Sent</h3>
                 {sent.length === 0 ? (
-                  <p className="text-center text-muted-foreground font-italic italic text-sm py-8">You haven't sent any letters yet ✦</p>
+                  <p className="text-center text-muted-foreground font-italic italic text-sm py-6">You haven't sent any letters yet ✦</p>
                 ) : (
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                    {sent.map((letter) => (
-                      <EnvelopeCard key={letter.id} letter={letter} isSent={true} onClick={() => handleOpenLetter(letter)} />
+                  <div className="flex flex-wrap justify-center gap-4">
+                    {sent.map((letter, i) => (
+                      <div
+                        key={letter.id}
+                        className="animate-fade-up"
+                        style={{ animationDelay: `${i * 0.08}s` }}
+                      >
+                        <MailboxEnvelope letter={letter} isSent={true} onClick={() => handleOpenLetter(letter)} />
+                      </div>
                     ))}
                   </div>
                 )}
               </div>
-            </>
+            </div>
           )}
         </div>
       )}
@@ -239,28 +263,43 @@ const LettersSection = () => {
   );
 };
 
-const EnvelopeCard = ({ letter, isSent, onClick }: { letter: LoveLetter; isSent: boolean; onClick: () => void }) => {
+const MailboxEnvelope = ({ letter, isSent, onClick }: { letter: LoveLetter; isSent: boolean; onClick: () => void }) => {
   const isOpened = isSent || letter.opened;
   return (
     <button
       onClick={onClick}
-      className="group relative flex flex-col items-center gap-2 p-4 rounded-lg border transition-all hover:scale-105"
-      style={{
-        background: isOpened ? "hsl(39 42% 61% / 0.05)" : "hsl(350 42% 68% / 0.08)",
-        borderColor: isOpened ? "hsl(39 42% 61% / 0.2)" : "hsl(350 42% 68% / 0.3)",
-      }}
+      className="group relative w-32 sm:w-36 transition-all hover:scale-105 hover:-translate-y-1"
     >
-      <span className={`text-4xl ${!isOpened ? "animate-pulse" : ""}`}>
-        {isOpened ? "💌" : "✉️"}
-      </span>
-      <span className="text-xs text-muted-foreground font-italic italic truncate max-w-full">
+      {/* Envelope shape */}
+      <div
+        className="relative w-full h-24 rounded-md shadow-md overflow-hidden"
+        style={{
+          background: isOpened ? "#fffdf8" : "#f5d5d5",
+          border: `1.5px solid ${isOpened ? "#d4a574" : "#c97070"}`,
+        }}
+      >
+        {/* Flap triangle */}
+        <div className="absolute top-0 left-0 w-full" style={{ height: 0, borderLeft: "64px solid transparent", borderRight: "64px solid transparent", borderTop: `28px solid ${isOpened ? "#e8d8c8" : "#e8b8b8"}` }} />
+        {/* Heart seal */}
+        {!isOpened && (
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-7 h-7 rounded-full flex items-center justify-center shadow-sm animate-pulse" style={{ background: "#c04040" }}>
+            <span className="text-white text-xs">♡</span>
+          </div>
+        )}
+        {isOpened && (
+          <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-2xl opacity-40">💌</span>
+        )}
+      </div>
+      {/* Label */}
+      <p className="mt-2 text-xs text-muted-foreground font-italic italic truncate">
         {isSent ? `To ${letter.to_name}` : `From ${letter.from_name}`}
-      </span>
-      <span className="text-[10px] text-muted-foreground/60">
+      </p>
+      <p className="text-[10px] text-muted-foreground/50">
         {new Date(letter.created_at).toLocaleDateString()}
-      </span>
+      </p>
+      {/* Unread dot */}
       {!isOpened && (
-        <span className="absolute -top-1 -right-1 w-3 h-3 bg-[#c97070] rounded-full animate-pulse" />
+        <span className="absolute -top-1 -right-1 w-3 h-3 bg-[#c04040] rounded-full animate-pulse shadow" />
       )}
     </button>
   );
