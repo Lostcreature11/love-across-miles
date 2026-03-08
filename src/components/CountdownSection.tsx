@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
-
-const COUNTDOWN_DATE_KEY = "countdown_date";
-const OPENED_NOTES_KEY = "countdown_opened";
+import { useRoom } from "@/contexts/RoomContext";
+import { supabase } from "@/integrations/supabase/client";
 
 const LOVE_NOTES = [
   "Good morning, love. Even before the sun rises, you're the first thing on my mind. I hope today treats you as gently as you treat my heart. ☀️",
@@ -19,26 +18,34 @@ const LOVE_NOTES = [
 ];
 
 const CountdownSection = () => {
-  const [meetingDate, setMeetingDate] = useState(() => localStorage.getItem(COUNTDOWN_DATE_KEY) || "");
-  const [dateInput, setDateInput] = useState(meetingDate);
+  const { roomId } = useRoom();
+  const [meetingDate, setMeetingDate] = useState("");
+  const [dateInput, setDateInput] = useState("");
   const [now, setNow] = useState(Date.now());
-  const [openedNotes, setOpenedNotes] = useState<number[]>(() => {
-    try { return JSON.parse(localStorage.getItem(OPENED_NOTES_KEY) || "[]"); } catch { return []; }
-  });
+  const [openedNotes, setOpenedNotes] = useState<number[]>([]);
   const [activeNote, setActiveNote] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (!roomId) return;
+    const load = async () => {
+      const { data } = await supabase.from("rooms").select("countdown_date, opened_notes").eq("id", roomId).single();
+      if (data) {
+        if (data.countdown_date) { setMeetingDate(data.countdown_date); setDateInput(data.countdown_date); }
+        if (data.opened_notes) setOpenedNotes(data.opened_notes as number[]);
+      }
+    };
+    load();
+  }, [roomId]);
 
   useEffect(() => {
     const iv = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(iv);
   }, []);
 
-  useEffect(() => { localStorage.setItem(OPENED_NOTES_KEY, JSON.stringify(openedNotes)); }, [openedNotes]);
-
-  const saveDate = () => {
-    if (dateInput) {
-      setMeetingDate(dateInput);
-      localStorage.setItem(COUNTDOWN_DATE_KEY, dateInput);
-    }
+  const saveDate = async () => {
+    if (!dateInput || !roomId) return;
+    await supabase.from("rooms").update({ countdown_date: dateInput }).eq("id", roomId);
+    setMeetingDate(dateInput);
   };
 
   const target = meetingDate ? new Date(meetingDate + "T00:00:00").getTime() : 0;
@@ -54,9 +61,13 @@ const CountdownSection = () => {
     return Date.now() >= unlockDate.getTime();
   };
 
-  const openNote = (index: number) => {
-    if (!isNoteUnlocked(index)) return;
-    if (!openedNotes.includes(index)) setOpenedNotes((prev) => [...prev, index]);
+  const openNote = async (index: number) => {
+    if (!isNoteUnlocked(index) || !roomId) return;
+    if (!openedNotes.includes(index)) {
+      const updated = [...openedNotes, index];
+      setOpenedNotes(updated);
+      await supabase.from("rooms").update({ opened_notes: updated }).eq("id", roomId);
+    }
     setActiveNote(index);
   };
 
@@ -67,35 +78,21 @@ const CountdownSection = () => {
       </h2>
 
       <div className="flex items-center justify-center gap-3 my-8">
-        <input
-          type="date"
-          className="bg-input rounded px-3 py-2 text-sm text-foreground font-body"
-          value={dateInput}
-          onChange={(e) => setDateInput(e.target.value)}
-        />
-        <button onClick={saveDate} className="px-4 py-2 bg-gold text-background rounded text-sm font-body hover:opacity-90 transition-opacity">
-          Save ✦
-        </button>
+        <input type="date" className="bg-input rounded px-3 py-2 text-sm text-foreground font-body" value={dateInput} onChange={(e) => setDateInput(e.target.value)} />
+        <button onClick={saveDate} className="px-4 py-2 bg-gold text-background rounded text-sm font-body hover:opacity-90 transition-opacity">Save ✦</button>
       </div>
 
       {meetingDate && (
         <>
           <div className="flex justify-center gap-6 md:gap-10 mb-4">
-            {[
-              { val: days, label: "Days" },
-              { val: hours, label: "Hours" },
-              { val: minutes, label: "Minutes" },
-              { val: seconds, label: "Seconds" },
-            ].map((item) => (
+            {[{ val: days, label: "Days" }, { val: hours, label: "Hours" }, { val: minutes, label: "Minutes" }, { val: seconds, label: "Seconds" }].map((item) => (
               <div key={item.label} className="flex flex-col items-center">
                 <span className="font-display text-4xl md:text-6xl text-gold-accent">{String(item.val).padStart(2, "0")}</span>
                 <span className="text-xs text-muted-foreground font-body uppercase tracking-wider">{item.label}</span>
               </div>
             ))}
           </div>
-          <p className="font-italic italic text-muted-foreground text-sm mb-12">
-            {days} days until I'm finally in your arms ♡
-          </p>
+          <p className="font-italic italic text-muted-foreground text-sm mb-12">{days} days until I'm finally in your arms ♡</p>
 
           <h3 className="font-display text-lg text-cream-accent mb-6">Love notes — open one each day ♡</h3>
           <div className="grid grid-cols-4 md:grid-cols-6 gap-3">
@@ -103,15 +100,9 @@ const CountdownSection = () => {
               const unlocked = isNoteUnlocked(i);
               const opened = openedNotes.includes(i);
               return (
-                <button
-                  key={i}
-                  onClick={() => openNote(i)}
-                  className={`aspect-square rounded-lg flex items-center justify-center text-lg font-display transition-all ${
-                    opened ? "bg-rose/20 text-rose-accent" : unlocked ? "bg-gold/20 text-gold-accent hover:bg-gold/30" : "bg-muted/30 text-muted-foreground cursor-not-allowed"
-                  }`}
-                >
+                <button key={i} onClick={() => openNote(i)} className={`aspect-square rounded-lg flex flex-col items-center justify-center text-lg font-display transition-all relative ${opened ? "bg-rose/20 text-rose-accent" : unlocked ? "bg-gold/20 text-gold-accent hover:bg-gold/30" : "bg-muted/30 text-muted-foreground cursor-not-allowed"}`}>
                   {opened ? "♡" : unlocked ? "✦" : "🔒"}
-                  <span className="absolute text-[10px] font-body mt-8">{i + 1}</span>
+                  <span className="text-[10px] font-body mt-1">{i + 1}</span>
                 </button>
               );
             })}
@@ -119,18 +110,13 @@ const CountdownSection = () => {
         </>
       )}
 
-      {/* Note modal */}
       {activeNote !== null && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" onClick={() => setActiveNote(null)}>
           <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" />
           <div className="relative z-10 animate-envelope bg-card rounded-lg p-8 max-w-md w-full text-center" onClick={(e) => e.stopPropagation()}>
             <div className="text-5xl mb-4">💌</div>
-            <p className="font-italic italic text-foreground leading-relaxed text-sm">
-              {LOVE_NOTES[activeNote]}
-            </p>
-            <button onClick={() => setActiveNote(null)} className="mt-6 text-gold-accent text-xs font-body hover:text-cream-accent">
-              Close ✕
-            </button>
+            <p className="font-italic italic text-foreground leading-relaxed text-sm">{LOVE_NOTES[activeNote]}</p>
+            <button onClick={() => setActiveNote(null)} className="mt-6 text-gold-accent text-xs font-body hover:text-cream-accent">Close ✕</button>
           </div>
         </div>
       )}
