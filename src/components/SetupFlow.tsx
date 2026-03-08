@@ -3,7 +3,7 @@ import { useRoom } from "@/contexts/RoomContext";
 import { supabase } from "@/integrations/supabase/client";
 
 const SetupFlow = () => {
-  const { createRoom, joinRoom, loading, roomId, partner } = useRoom();
+  const { createRoom, joinRoom, loading, roomId, partner, isReady } = useRoom();
   const pendingCode = localStorage.getItem("pending_room_code") || "";
   const [step, setStep] = useState<"choice" | "create" | "join">(pendingCode ? "join" : "choice");
   const [name, setName] = useState("");
@@ -22,7 +22,7 @@ const SetupFlow = () => {
   }
 
   // If room is created and waiting for partner, show waiting screen
-  if (generatedCode && roomId && !partner) {
+  if (generatedCode && roomId && !partner && !isReady) {
     return (
       <div className="min-h-screen flex items-center justify-center px-4 relative z-10">
         <div className="w-full max-w-md text-center space-y-6 animate-fade-up">

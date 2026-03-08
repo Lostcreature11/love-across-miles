@@ -24,6 +24,10 @@ const LettersSection = () => {
   const { notify } = useNotifications();
   const [view, setView] = useState<"compose" | "inbox">("inbox");
   const [toName, setToName] = useState(partner?.name || "");
+
+  useEffect(() => {
+    if (partner?.name) setToName(partner.name);
+  }, [partner?.name]);
   const [message, setMessage] = useState("");
   const [letters, setLetters] = useState<LoveLetter[]>([]);
   const [loading, setLoading] = useState(true);

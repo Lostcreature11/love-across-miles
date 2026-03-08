@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, useRef, ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 interface Member {
@@ -47,10 +47,11 @@ export const RoomProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   // Realtime: listen for new members joining the room
+  const memberChannelRef = useRef<any>(null);
   useEffect(() => {
-    if (!roomId || !me) return;
-    const channel = supabase
-      .channel('members-changes')
+    if (!roomId || !me || memberChannelRef.current) return;
+    memberChannelRef.current = supabase
+      .channel(`members-${roomId}`)
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'room_members', filter: `room_id=eq.${roomId}` }, (payload) => {
         const newMember = payload.new as any;
         if (newMember.id !== me.id) {
@@ -68,8 +69,11 @@ export const RoomProvider = ({ children }: { children: ReactNode }) => {
         }
       })
       .subscribe();
-    return () => { supabase.removeChannel(channel); };
-  }, [roomId, me]);
+    return () => {
+      memberChannelRef.current?.unsubscribe();
+      memberChannelRef.current = null;
+    };
+  }, [roomId, me?.id]);
 
   const restoreSession = async (token: string) => {
     const { data: member } = await supabase
