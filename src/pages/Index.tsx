@@ -8,7 +8,7 @@ import DiarySection from "@/components/DiarySection";
 import CountdownSection from "@/components/CountdownSection";
 import LettersSection from "@/components/LettersSection";
 import GoodnightSection from "@/components/GoodnightSection";
-import RedStringSection from "@/components/RedStringSection";
+
 import HeartbeatSection from "@/components/HeartbeatSection";
 import StarWishSection from "@/components/StarWishSection";
 import StarWishOverlay from "@/components/StarWishOverlay";
@@ -53,8 +53,6 @@ const IndexContent = () => {
         return <LettersSection />;
       case "goodnight":
         return <GoodnightSection />;
-      case "red-string":
-        return <RedStringSection />;
       case "heartbeat":
         return <HeartbeatSection />;
       case "wishes":
