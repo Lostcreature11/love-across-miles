@@ -59,6 +59,84 @@ export type Database = {
           },
         ]
       }
+      goodnight_rituals: {
+        Row: {
+          created_at: string
+          id: string
+          message: string | null
+          room_id: string
+          sender_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message?: string | null
+          room_id: string
+          sender_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: string | null
+          room_id?: string
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "goodnight_rituals_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "goodnight_rituals_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "room_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      heartbeat_messages: {
+        Row: {
+          created_at: string
+          id: string
+          pattern: number[]
+          room_id: string
+          sender_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          pattern: number[]
+          room_id: string
+          sender_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          pattern?: number[]
+          room_id?: string
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "heartbeat_messages_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "heartbeat_messages_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "room_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       love_letters: {
         Row: {
           created_at: string
@@ -103,6 +181,48 @@ export type Database = {
             columns: ["sender_id"]
             isOneToOne: false
             referencedRelation: "room_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      red_string_charms: {
+        Row: {
+          added_by: string
+          created_at: string
+          emoji: string
+          id: string
+          label: string
+          room_id: string
+        }
+        Insert: {
+          added_by: string
+          created_at?: string
+          emoji?: string
+          id?: string
+          label: string
+          room_id: string
+        }
+        Update: {
+          added_by?: string
+          created_at?: string
+          emoji?: string
+          id?: string
+          label?: string
+          room_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "red_string_charms_added_by_fkey"
+            columns: ["added_by"]
+            isOneToOne: false
+            referencedRelation: "room_members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "red_string_charms_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
             referencedColumns: ["id"]
           },
         ]
@@ -201,6 +321,45 @@ export type Database = {
             columns: ["room_id"]
             isOneToOne: false
             referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      star_wishes: {
+        Row: {
+          created_at: string
+          id: string
+          room_id: string
+          sender_id: string
+          wish: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          room_id: string
+          sender_id: string
+          wish: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          room_id?: string
+          sender_id?: string
+          wish?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "star_wishes_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "star_wishes_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "room_members"
             referencedColumns: ["id"]
           },
         ]
