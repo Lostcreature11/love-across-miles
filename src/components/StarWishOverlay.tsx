@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRoom } from "@/contexts/RoomContext";
 import { supabase } from "@/integrations/supabase/client";
+import { playTwinkle } from "@/lib/sounds";
 
 interface WishEvent {
   wish: string;
