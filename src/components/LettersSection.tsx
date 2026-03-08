@@ -192,7 +192,7 @@ const LettersSection = () => {
                   </div>
                 )}
                 {/* Letters stacked behind/inside the mailbox */}
-                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 z-[5] flex items-end justify-center" style={{ width: "220px" }}>
+                <div className="absolute bottom-0 left-1/3 -translate-x-1/2 z-[5] flex items-end justify-center" style={{ width: "220px" }}>
                   {received.slice(0, 6).map((letter, i) => {
                     const isOpened = letter.opened;
                     const total = Math.min(received.length, 6);
