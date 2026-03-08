@@ -59,6 +59,54 @@ export type Database = {
           },
         ]
       }
+      love_letters: {
+        Row: {
+          created_at: string
+          from_name: string
+          id: string
+          message: string
+          opened: boolean
+          room_id: string
+          sender_id: string
+          to_name: string
+        }
+        Insert: {
+          created_at?: string
+          from_name: string
+          id?: string
+          message: string
+          opened?: boolean
+          room_id: string
+          sender_id: string
+          to_name: string
+        }
+        Update: {
+          created_at?: string
+          from_name?: string
+          id?: string
+          message?: string
+          opened?: boolean
+          room_id?: string
+          sender_id?: string
+          to_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "love_letters_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "love_letters_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "room_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       room_members: {
         Row: {
           created_at: string
