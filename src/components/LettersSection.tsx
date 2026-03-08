@@ -289,6 +289,7 @@ const LettersSection = () => {
                   })
                 )}
               </div>
+            </div>
           )}
         </div>
       )}
