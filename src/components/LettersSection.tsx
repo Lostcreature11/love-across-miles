@@ -74,19 +74,20 @@ const LettersSection = () => {
   }, [roomId, me]);
 
   const handleSend = async () => {
-    if (!roomId || !me || !partner || message.trim().length < 10) return;
+    if (!roomId || !me || toName.trim().length === 0 || message.trim().length < 10) return;
     setSending(true);
     try {
       const { error } = await supabase.from("love_letters").insert({
         room_id: roomId,
         sender_id: me.id,
-        to_name: partner.name,
+        to_name: toName.trim(),
         from_name: me.name,
         message: message.trim(),
       });
       if (error) throw error;
       toast({ title: "💌 Your letter is on its way…" });
       setMessage("");
+      setToName(partner?.name || "");
       setView("inbox");
     } catch {
       toast({ title: "Error", description: "Failed to send letter", variant: "destructive" });
