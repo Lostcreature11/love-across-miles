@@ -17,12 +17,13 @@ interface RoomContextType {
   loading: boolean;
   createRoom: (name: string, pronoun: "she" | "he") => Promise<string>;
   joinRoom: (code: string, name: string, pronoun: "she" | "he") => Promise<boolean>;
+  leaveRoom: () => void;
   isReady: boolean;
 }
 
 const RoomContext = createContext<RoomContextType>({
   roomId: null, roomCode: null, me: null, partner: null, members: [], loading: true,
-  createRoom: async () => "", joinRoom: async () => false, isReady: false,
+  createRoom: async () => "", joinRoom: async () => false, leaveRoom: () => {}, isReady: false,
 });
 
 export const useRoom = () => useContext(RoomContext);
@@ -152,10 +153,19 @@ export const RoomProvider = ({ children }: { children: ReactNode }) => {
     return true;
   };
 
+  const leaveRoom = () => {
+    localStorage.removeItem("member_token");
+    setRoomId(null);
+    setRoomCode(null);
+    setMe(null);
+    setPartner(null);
+    setMembers([]);
+  };
+
   const isReady = !!roomId && !!me;
 
   return (
-    <RoomContext.Provider value={{ roomId, roomCode, me, partner, members, loading, createRoom, joinRoom, isReady }}>
+    <RoomContext.Provider value={{ roomId, roomCode, me, partner, members, loading, createRoom, joinRoom, leaveRoom, isReady }}>
       {children}
     </RoomContext.Provider>
   );
