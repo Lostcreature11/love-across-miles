@@ -153,10 +153,19 @@ export const RoomProvider = ({ children }: { children: ReactNode }) => {
     return true;
   };
 
+  const leaveRoom = () => {
+    localStorage.removeItem("member_token");
+    setRoomId(null);
+    setRoomCode(null);
+    setMe(null);
+    setPartner(null);
+    setMembers([]);
+  };
+
   const isReady = !!roomId && !!me;
 
   return (
-    <RoomContext.Provider value={{ roomId, roomCode, me, partner, members, loading, createRoom, joinRoom, isReady }}>
+    <RoomContext.Provider value={{ roomId, roomCode, me, partner, members, loading, createRoom, joinRoom, leaveRoom, isReady }}>
       {children}
     </RoomContext.Provider>
   );
