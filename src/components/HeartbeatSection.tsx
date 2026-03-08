@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useRoom } from "@/contexts/RoomContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { playHeartbeat } from "@/lib/sounds";
 
 interface HeartbeatMessage {
   id: string;
@@ -106,7 +107,7 @@ const HeartbeatSection = () => {
       await new Promise(r => setTimeout(r, pattern[i]));
       setPulseAnim(true);
       setActiveBar(i);
-      // Vibration API
+      playHeartbeat();
       if (navigator.vibrate) {
         navigator.vibrate(100);
       }

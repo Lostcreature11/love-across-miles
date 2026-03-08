@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useRoom } from "@/contexts/RoomContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { playChime } from "@/lib/sounds";
 
 interface GoodnightRitual {
   id: string;
@@ -75,6 +76,7 @@ const GoodnightSection = () => {
           setOverlayData({ name: senderName, message: ritual.message });
           setShowOverlay(true);
           setLastReceived(ritual);
+          playChime();
           setTimeout(() => setShowOverlay(false), 6000);
         }
       })

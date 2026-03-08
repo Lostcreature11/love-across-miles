@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRoom } from "@/contexts/RoomContext";
 import { supabase } from "@/integrations/supabase/client";
+import { playTwinkle } from "@/lib/sounds";
 
 interface WishEvent {
   wish: string;
@@ -45,6 +46,7 @@ const StarWishOverlay = () => {
     setQueue(prev => prev.slice(1));
 
     // Shooting star phase
+    playTwinkle();
     setStarPhase("shooting");
     await new Promise(r => setTimeout(r, 1500));
     
