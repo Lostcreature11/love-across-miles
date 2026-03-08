@@ -17,7 +17,6 @@ interface Props {
 const LetterOpeningFlow = ({ letter, onClose }: Props) => {
   const [stage, setStage] = useState(1);
 
-  // Stage 1 auto-advance after 2s
   useEffect(() => {
     if (stage === 1) {
       const t = setTimeout(() => setStage(2), 2000);
@@ -25,7 +24,6 @@ const LetterOpeningFlow = ({ letter, onClose }: Props) => {
     }
   }, [stage]);
 
-  // Stage 3 auto-advance after 1.8s
   useEffect(() => {
     if (stage === 3) {
       const t = setTimeout(() => setStage(4), 1800);
@@ -43,25 +41,17 @@ const LetterOpeningFlow = ({ letter, onClose }: Props) => {
       {/* Stage 1 — Mailbox */}
       {stage === 1 && (
         <div className="flex flex-col items-center gap-6 animate-fade-up cursor-pointer" onClick={() => setStage(2)}>
-          {/* CSS Mailbox */}
           <div className="relative w-40 h-48">
-            {/* Post */}
             <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-24 rounded-sm" style={{ background: "#d4a574" }} />
-            {/* Body */}
             <div className="absolute top-4 left-1/2 -translate-x-1/2 w-36 h-24 rounded-lg" style={{ background: "#e8a0a0", border: "2px solid #d4a574" }}>
-              {/* Gold trim */}
               <div className="absolute top-1/2 -translate-y-1/2 w-full h-1" style={{ background: "#d4a574" }} />
-              {/* Slot */}
               <div className="absolute top-6 left-1/2 -translate-x-1/2 w-20 h-2 rounded-full" style={{ background: "#3d2020" }} />
             </div>
-            {/* Lid */}
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-40 h-10 rounded-t-[50%]" style={{ background: "#d4878f", border: "2px solid #d4a574", borderBottom: "none" }} />
-            {/* Flag */}
             <div className="absolute top-2 -right-2 w-3 h-8">
               <div className="w-1 h-8 rounded-full mx-auto" style={{ background: "#d4a574" }} />
               <div className="absolute top-0 right-0 w-4 h-3 rounded-sm" style={{ background: "#c04040" }} />
             </div>
-            {/* Envelope peeking */}
             <div className="absolute top-1 left-1/2 -translate-x-1/2 w-14 h-8 rounded-sm" style={{
               background: "#fffdf8",
               border: "1px solid #d4a574",
@@ -72,10 +62,6 @@ const LetterOpeningFlow = ({ letter, onClose }: Props) => {
                 borderRight: "28px solid transparent",
                 borderTop: "14px solid #e8c0c0",
               }} />
-            </div>
-            {/* Roses */}
-            <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 flex gap-1 text-lg">
-              🌹🌸🌹
             </div>
           </div>
           <p className="text-xl" style={{ fontFamily: "'Dancing Script', cursive", color: "#fde8e8" }}>
@@ -88,9 +74,7 @@ const LetterOpeningFlow = ({ letter, onClose }: Props) => {
       {/* Stage 2 — Envelope pickup */}
       {stage === 2 && (
         <div className="flex flex-col items-center gap-8" style={{ animation: "envelopeFlyUp 0.8s cubic-bezier(.34,1.56,.64,1) forwards" }}>
-          {/* Envelope */}
           <div className="relative w-72 h-48 rounded-lg shadow-2xl" style={{ background: "#f5d5d5", border: "2px solid #d4a574" }}>
-            {/* Flap */}
             <div className="absolute -top-[1px] left-0 w-full overflow-hidden" style={{ height: "60px" }}>
               <div className="w-0 h-0 mx-auto" style={{
                 borderLeft: "144px solid transparent",
@@ -98,18 +82,14 @@ const LetterOpeningFlow = ({ letter, onClose }: Props) => {
                 borderTop: "60px solid #e8b8b8",
               }} />
             </div>
-            {/* Bow */}
             <div className="absolute -top-3 left-1/2 -translate-x-1/2 text-3xl z-10">🎀</div>
-            {/* Stamps */}
             <div className="absolute top-2 right-3 flex gap-2 text-xl">
               <span className="border border-[#c04040]/30 rounded px-1 text-sm" style={{ background: "#fffdf8" }}>💕</span>
               <span className="border border-[#c04040]/30 rounded px-1 text-sm" style={{ background: "#fffdf8" }}>🔑</span>
             </div>
-            {/* Wax seal */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 rounded-full flex items-center justify-center shadow-lg" style={{ background: "#c04040" }}>
               <span className="text-white text-lg">♡</span>
             </div>
-            {/* Heart watermarks */}
             <span className="absolute bottom-3 left-4 text-[#e8c0c0]/40 text-2xl">♡</span>
             <span className="absolute top-14 left-8 text-[#e8c0c0]/30 text-lg">♡</span>
             <span className="absolute bottom-4 right-6 text-[#e8c0c0]/30 text-xl">♡</span>
@@ -127,9 +107,7 @@ const LetterOpeningFlow = ({ letter, onClose }: Props) => {
       {/* Stage 3 — Opening animation */}
       {stage === 3 && (
         <div className="relative flex flex-col items-center">
-          {/* Envelope body */}
           <div className="relative w-72 h-48 rounded-lg shadow-2xl" style={{ background: "#f5d5d5", border: "2px solid #d4a574" }}>
-            {/* Flap opening */}
             <div className="absolute -top-[1px] left-0 w-full origin-top" style={{
               height: "60px",
               animation: "flapOpen 1.2s ease-out forwards",
@@ -141,7 +119,6 @@ const LetterOpeningFlow = ({ letter, onClose }: Props) => {
                 borderTop: "60px solid #e8b8b8",
               }} />
             </div>
-            {/* Wax seal popping */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 rounded-full flex items-center justify-center shadow-lg z-10" style={{
               background: "#c04040",
               animation: "sealPop 0.6s cubic-bezier(.34,1.56,.64,1) 0.4s both",
@@ -149,7 +126,6 @@ const LetterOpeningFlow = ({ letter, onClose }: Props) => {
               <span className="text-white text-lg">♡</span>
             </div>
           </div>
-          {/* Letter rising */}
           <div className="absolute -top-4 w-64 h-40 rounded shadow-xl" style={{
             background: "#fffdf8",
             animation: "letterRise 1s ease-out 0.6s both",
@@ -168,11 +144,10 @@ const LetterOpeningFlow = ({ letter, onClose }: Props) => {
             ✕ Close
           </button>
 
-          {/* Stamp-edge letter */}
-           <div className="relative p-8 sm:p-10 rounded-lg shadow-2xl" style={{
-173:             background: "#fffdf8",
-174:             border: "2px solid #d4a574",
-175:           }}>
+          <div className="relative p-8 sm:p-10 rounded-lg shadow-2xl" style={{
+            background: "#fffdf8",
+            border: "2px solid #d4a574",
+          }}>
             {/* Header */}
             <div className="flex justify-between items-start mb-4">
               <div>
@@ -219,17 +194,14 @@ const LetterOpeningFlow = ({ letter, onClose }: Props) => {
             {/* Footer */}
             <div className="flex items-center justify-between text-xs" style={{ color: "#c97070" }}>
               <span style={{ fontFamily: "'Dancing Script', cursive", fontSize: "1.1rem" }}>{dateStr}</span>
-              <span>🌸 🌹 🌺</span>
               <div className="w-10 h-10 rounded-full border-2 flex items-center justify-center rotate-12" style={{ borderColor: "#c04040" }}>
                 <span className="text-[8px] text-center leading-tight" style={{ color: "#c04040" }}>LOVE<br />POST</span>
               </div>
             </div>
           </div>
-
         </div>
       )}
 
-      {/* Inline keyframes */}
       <style>{`
         @keyframes envelopeBounce {
           0%, 100% { transform: translate(-50%, 0); }
@@ -250,10 +222,6 @@ const LetterOpeningFlow = ({ letter, onClose }: Props) => {
         @keyframes letterRise {
           0% { transform: translateY(40px); opacity: 0; }
           100% { transform: translateY(-160px); opacity: 1; }
-        }
-        @keyframes floatUp {
-          0% { opacity: 1; transform: translateY(0) scale(1); }
-          100% { opacity: 0; transform: translateY(-400px) scale(0.5); }
         }
       `}</style>
     </div>
