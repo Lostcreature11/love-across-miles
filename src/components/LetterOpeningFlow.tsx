@@ -245,20 +245,6 @@ const LetterOpeningFlow = ({ letter, onClose }: Props) => {
             </div>
           </div>
 
-          {/* Floating hearts */}
-          {hearts.map((h) => (
-            <span
-              key={h.id}
-              className="absolute text-2xl pointer-events-none"
-              style={{
-                left: `${h.x}%`,
-                bottom: 0,
-                animation: `floatUp 3s ease-out ${h.delay}s both`,
-              }}
-            >
-              {h.emoji}
-            </span>
-          ))}
         </div>
       )}
 
