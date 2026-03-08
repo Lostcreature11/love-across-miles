@@ -170,7 +170,7 @@ const DiarySection = () => {
               onChange={(e) => setMyText(e.target.value)}
             />
             <div className="flex gap-3 mt-4 pt-4" style={{ borderTop: "1px dashed #c0b090" }}>
-              <button onClick={saveEntry} className={`text-sm font-body px-4 py-2 rounded transition-opacity hover:opacity-90 ${me?.pronoun === "she" ? "bg-rose/80 text-background" : "bg-gold/80 text-background"}`}>Save ✦</button>
+              <button onClick={saveEntry} className={`text-sm font-body px-4 py-2 rounded transition-opacity hover:opacity-90 ${me?.pronoun === "she" ? "bg-rose/80 text-background" : "bg-gold/80 text-background"}`}>Save {me?.pronoun === "she" ? "🦋" : "🦢"}</button>
               <button onClick={deleteEntry} className="text-sm font-body px-4 py-2 bg-muted text-foreground rounded hover:opacity-80">Delete</button>
               <button onClick={backToCalendar} className="text-sm font-body px-4 py-2 text-muted-foreground hover:text-foreground">Cancel</button>
             </div>

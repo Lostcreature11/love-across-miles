@@ -153,7 +153,7 @@ const SetupFlow = () => {
               disabled={!name.trim() || !pronoun || !code.trim() || submitting}
               className="w-full py-3 bg-rose text-background rounded-lg font-body hover:opacity-90 transition-opacity disabled:opacity-50"
             >
-              {submitting ? "Joining…" : "Join 💋🦋"}
+              {submitting ? "Joining…" : "Join 💍🌚"}
             </button>
             <button onClick={() => setStep("choice")} className="text-muted-foreground text-xs hover:text-foreground">← Back</button>
           </div>

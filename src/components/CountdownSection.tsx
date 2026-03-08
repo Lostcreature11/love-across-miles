@@ -101,7 +101,7 @@ const CountdownSection = () => {
               const opened = openedNotes.includes(i);
               return (
                 <button key={i} onClick={() => openNote(i)} className={`aspect-square rounded-lg flex flex-col items-center justify-center text-lg font-display transition-all relative ${opened ? "bg-rose/20 text-rose-accent" : unlocked ? "bg-gold/20 text-gold-accent hover:bg-gold/30" : "bg-muted/30 text-muted-foreground cursor-not-allowed"}`}>
-                  {opened ? "♡" : unlocked ? "✦" : "🔒"}
+                  {opened ? "💋" : unlocked ? "✨" : "🔒"}
                   <span className="text-[10px] font-body mt-1">{i + 1}</span>
                 </button>
               );

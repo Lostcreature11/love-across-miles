@@ -77,7 +77,7 @@ const WhyYouSection = () => {
           onKeyDown={(e) => e.key === "Enter" && addReason()}
         />
         <button onClick={addReason} className="px-4 py-2 bg-gold text-background rounded text-sm font-body hover:opacity-90 transition-opacity">
-          Add ✦
+          Add 💫
         </button>
       </div>
     </section>
