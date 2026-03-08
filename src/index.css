@@ -198,4 +198,44 @@
   .hover-wiggle:hover {
     animation: wiggle 0.5s ease-in-out;
   }
+
+  /* Goodnight feature */
+  @keyframes floatUp {
+    0% { opacity: 0; transform: translateY(0) scale(0.5); }
+    20% { opacity: 0.8; }
+    100% { opacity: 0; transform: translateY(-100vh) scale(1.2) rotate(20deg); }
+  }
+
+  @keyframes softPulse {
+    0%, 100% { box-shadow: 0 0 30px hsl(var(--rose) / 0.15); }
+    50% { box-shadow: 0 0 50px hsl(var(--rose) / 0.3), 0 0 80px hsl(var(--gold) / 0.1); }
+  }
+
+  @keyframes overlayFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  /* Red String feature */
+  @keyframes stringWave {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(2px); }
+  }
+
+  @keyframes charmBounce {
+    0% { opacity: 0; transform: scale(0) translateY(-10px); }
+    60% { opacity: 1; transform: scale(1.1) translateY(2px); }
+    100% { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  /* Shooting Star Wish */
+  @keyframes shootingStar {
+    0% { transform: translateX(0) translateY(0) rotate(30deg); opacity: 1; }
+    100% { transform: translateX(60vw) translateY(30vh) rotate(30deg); opacity: 0; }
+  }
+
+  @keyframes wishFadeIn {
+    0% { opacity: 0; transform: translateY(10px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
 }

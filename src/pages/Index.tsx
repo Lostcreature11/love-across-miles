@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Starfield from "@/components/Starfield";
 import CustomCursor from "@/components/CustomCursor";
 import Navbar from "@/components/Navbar";
@@ -7,9 +7,13 @@ import WhyYouSection from "@/components/WhyYouSection";
 import DiarySection from "@/components/DiarySection";
 import CountdownSection from "@/components/CountdownSection";
 import LettersSection from "@/components/LettersSection";
+import GoodnightSection from "@/components/GoodnightSection";
+import RedStringSection from "@/components/RedStringSection";
+import HeartbeatSection from "@/components/HeartbeatSection";
+import StarWishSection from "@/components/StarWishSection";
+import StarWishOverlay from "@/components/StarWishOverlay";
 import SetupFlow from "@/components/SetupFlow";
 import { useRoom } from "@/contexts/RoomContext";
-import { useEffect } from "react";
 
 const IndexContent = () => {
   const { isReady, roomCode } = useRoom();
@@ -47,6 +51,14 @@ const IndexContent = () => {
         return <CountdownSection />;
       case "letters":
         return <LettersSection />;
+      case "goodnight":
+        return <GoodnightSection />;
+      case "red-string":
+        return <RedStringSection />;
+      case "heartbeat":
+        return <HeartbeatSection />;
+      case "wishes":
+        return <StarWishSection />;
       default:
         return <HeroSection onExplore={() => setActiveTab("why-you")} />;
     }
@@ -56,6 +68,7 @@ const IndexContent = () => {
     <div className="relative min-h-screen bg-background overflow-x-hidden">
       <Starfield />
       <CustomCursor />
+      <StarWishOverlay />
       <div className="grain-overlay" />
       {activeTab !== "prologue" && <Navbar activeTab={activeTab} onTabChange={setActiveTab} />}
       
