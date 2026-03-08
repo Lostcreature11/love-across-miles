@@ -182,18 +182,61 @@ const LettersSection = () => {
             <p className="text-center text-gold-accent font-italic italic animate-pulse">Loading… ♡</p>
           ) : (
             <div className="flex flex-col items-center">
-              {/* Mailbox hero */}
-              <div className="relative mb-8">
-                <img src={mailboxImg} alt="Love mailbox" className="w-56 sm:w-64 mx-auto rounded-xl drop-shadow-lg" />
-                {/* Letter count badge */}
+              {/* Mailbox with letters stacked inside */}
+              <div className="relative mb-10">
+                <img src={mailboxImg} alt="Love mailbox" className="w-56 sm:w-64 mx-auto rounded-xl drop-shadow-lg relative z-10" />
+                {/* Unread badge */}
                 {received.filter(l => !l.opened).length > 0 && (
-                  <div className="absolute -top-2 -right-2 w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold animate-pulse shadow-lg" style={{ background: "#c04040" }}>
+                  <div className="absolute -top-2 -right-2 z-20 w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold animate-pulse shadow-lg" style={{ background: "#c04040" }}>
                     {received.filter(l => !l.opened).length}
                   </div>
                 )}
+                {/* Letters stacked behind/inside the mailbox */}
+                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 z-[5] flex items-end justify-center" style={{ width: "220px" }}>
+                  {[...received, ...sent].slice(0, 6).map((letter, i) => {
+                    const isSentLetter = letter.sender_id === me?.id;
+                    const isOpened = isSentLetter || letter.opened;
+                    const total = Math.min([...received, ...sent].length, 6);
+                    const offset = (i - (total - 1) / 2) * 18;
+                    const rotation = (i - (total - 1) / 2) * 5;
+                    const peekHeight = 20 + i * 6;
+                    return (
+                      <div
+                        key={letter.id}
+                        className="absolute cursor-pointer transition-all duration-300 hover:-translate-y-4 hover:z-30 opacity-0"
+                        style={{
+                          left: `calc(50% + ${offset}px)`,
+                          bottom: `${peekHeight}px`,
+                          transform: `translateX(-50%) rotate(${rotation}deg)`,
+                          zIndex: 5 + i,
+                          animation: `mailboxSpill 0.7s cubic-bezier(.34,1.56,.64,1) ${0.3 + i * 0.12}s forwards`,
+                        }}
+                        onClick={() => handleOpenLetter(letter)}
+                      >
+                        <div
+                          className="w-20 h-14 rounded-md shadow-md relative overflow-hidden"
+                          style={{
+                            background: isOpened ? "#fffdf8" : "#f5d5d5",
+                            border: `1.5px solid ${isOpened ? "hsl(var(--gold))" : "hsl(var(--rose))"}`,
+                          }}
+                        >
+                          <div className="absolute top-0 left-0 w-full" style={{ height: 0, borderLeft: "40px solid transparent", borderRight: "40px solid transparent", borderTop: `16px solid ${isOpened ? "#e8d8c8" : "#e8b8b8"}` }} />
+                          {!isOpened && (
+                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-5 h-5 rounded-full flex items-center justify-center animate-pulse" style={{ background: "#c04040" }}>
+                              <span className="text-white text-[8px]">♡</span>
+                            </div>
+                          )}
+                        </div>
+                        <p className="text-[9px] text-muted-foreground text-center mt-1 italic truncate w-20">
+                          {isSentLetter ? `To ${letter.to_name}` : `${letter.from_name}`}
+                        </p>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
 
-              {/* Received letters spilling out of mailbox */}
+              {/* Full letter lists below */}
               <div className="w-full mb-10">
                 <h3 className="font-display text-lg text-gold-accent mb-4 tracking-wider text-center">💌 Received</h3>
                 {received.length === 0 ? (
@@ -201,13 +244,7 @@ const LettersSection = () => {
                 ) : (
                   <div className="flex flex-wrap justify-center gap-4">
                     {received.map((letter, i) => (
-                      <div
-                        key={letter.id}
-                        className="opacity-0"
-                        style={{
-                          animation: `mailboxSpill 0.7s cubic-bezier(.34,1.56,.64,1) ${0.3 + i * 0.12}s forwards`,
-                        }}
-                      >
+                      <div key={letter.id} className="opacity-0" style={{ animation: `mailboxSpill 0.7s cubic-bezier(.34,1.56,.64,1) ${0.3 + i * 0.12}s forwards` }}>
                         <MailboxEnvelope letter={letter} isSent={false} onClick={() => handleOpenLetter(letter)} />
                       </div>
                     ))}
@@ -215,7 +252,6 @@ const LettersSection = () => {
                 )}
               </div>
 
-              {/* Sent */}
               <div className="w-full">
                 <h3 className="font-display text-lg text-gold-accent mb-4 tracking-wider text-center">✉️ Sent</h3>
                 {sent.length === 0 ? (
@@ -223,13 +259,7 @@ const LettersSection = () => {
                 ) : (
                   <div className="flex flex-wrap justify-center gap-4">
                     {sent.map((letter, i) => (
-                      <div
-                        key={letter.id}
-                        className="opacity-0"
-                        style={{
-                          animation: `mailboxSpill 0.7s cubic-bezier(.34,1.56,.64,1) ${0.3 + i * 0.12}s forwards`,
-                        }}
-                      >
+                      <div key={letter.id} className="opacity-0" style={{ animation: `mailboxSpill 0.7s cubic-bezier(.34,1.56,.64,1) ${0.3 + i * 0.12}s forwards` }}>
                         <MailboxEnvelope letter={letter} isSent={true} onClick={() => handleOpenLetter(letter)} />
                       </div>
                     ))}
