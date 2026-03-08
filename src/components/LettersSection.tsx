@@ -109,7 +109,6 @@ const LettersSection = () => {
   };
 
   const received = letters.filter((l) => l.sender_id !== me?.id);
-  const sent = letters.filter((l) => l.sender_id === me?.id);
 
   return (
     <section className="min-h-screen px-4 py-8 max-w-2xl mx-auto">
@@ -193,10 +192,9 @@ const LettersSection = () => {
                 )}
                 {/* Letters stacked behind/inside the mailbox */}
                 <div className="absolute bottom-0 left-1/2 -translate-x-1/2 z-[5] flex items-end justify-center" style={{ width: "220px" }}>
-                  {[...received, ...sent].slice(0, 6).map((letter, i) => {
-                    const isSentLetter = letter.sender_id === me?.id;
-                    const isOpened = isSentLetter || letter.opened;
-                    const total = Math.min([...received, ...sent].length, 6);
+                  {received.slice(0, 6).map((letter, i) => {
+                    const isOpened = letter.opened;
+                    const total = Math.min(received.length, 6);
                     const offset = (i - (total - 1) / 2) * 18;
                     const rotation = (i - (total - 1) / 2) * 5;
                     const peekHeight = 20 + i * 6;
@@ -228,7 +226,7 @@ const LettersSection = () => {
                           )}
                         </div>
                         <p className="text-[9px] text-muted-foreground text-center mt-1 italic truncate w-20">
-                          {isSentLetter ? `To ${letter.to_name}` : `${letter.from_name}`}
+                          {letter.from_name}
                         </p>
                       </div>
                     );
@@ -252,20 +250,6 @@ const LettersSection = () => {
                 )}
               </div>
 
-              <div className="w-full">
-                <h3 className="font-display text-lg text-gold-accent mb-4 tracking-wider text-center">✉️ Sent</h3>
-                {sent.length === 0 ? (
-                  <p className="text-center text-muted-foreground font-italic italic text-sm py-6">You haven't sent any letters yet ✦</p>
-                ) : (
-                  <div className="flex flex-wrap justify-center gap-4">
-                    {sent.map((letter, i) => (
-                      <div key={letter.id} className="opacity-0" style={{ animation: `mailboxSpill 0.7s cubic-bezier(.34,1.56,.64,1) ${0.3 + i * 0.12}s forwards` }}>
-                        <MailboxEnvelope letter={letter} isSent={true} onClick={() => handleOpenLetter(letter)} />
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
             </div>
           )}
         </div>
