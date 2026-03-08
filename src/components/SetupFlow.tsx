@@ -3,7 +3,7 @@ import { useRoom } from "@/contexts/RoomContext";
 import { supabase } from "@/integrations/supabase/client";
 
 const SetupFlow = () => {
-  const { createRoom, joinRoom, loading, roomId, partner } = useRoom();
+  const { createRoom, joinRoom, loading, roomId, partner, isReady } = useRoom();
   const pendingCode = localStorage.getItem("pending_room_code") || "";
   const [step, setStep] = useState<"choice" | "create" | "join">(pendingCode ? "join" : "choice");
   const [name, setName] = useState("");
