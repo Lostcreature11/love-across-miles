@@ -62,7 +62,7 @@ const SetupFlow = () => {
               onClick={() => setStep("join")}
               className="w-full py-3 bg-rose/20 border border-rose/40 rounded-lg text-rose-accent font-body hover:bg-rose/30 transition-colors"
             >
-              Join My Love 🌸
+              Join My Love 💋🦋
             </button>
           </div>
         )}
