@@ -56,7 +56,7 @@ const SetupFlow = () => {
               onClick={() => setStep("create")}
               className="w-full py-3 bg-gold/20 border border-gold/40 rounded-lg text-gold-accent font-body hover:bg-gold/30 transition-colors"
             >
-              Create Our Space ✦
+              Create Our Space ✨🌙
             </button>
             <button
               onClick={() => setStep("join")}
