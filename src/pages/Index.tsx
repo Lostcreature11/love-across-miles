@@ -53,8 +53,6 @@ const IndexContent = () => {
         return <LettersSection />;
       case "goodnight":
         return <GoodnightSection />;
-      case "red-string":
-        return <RedStringSection />;
       case "heartbeat":
         return <HeartbeatSection />;
       case "wishes":
