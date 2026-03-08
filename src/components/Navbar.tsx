@@ -42,18 +42,18 @@ const Navbar = ({ activeTab, onTabChange }: NavbarProps) => {
           ♡
         </button>
 
-        <div className="flex gap-2 md:gap-6">
+        <div className="flex gap-1 md:gap-3 overflow-x-auto scrollbar-hide">
           {tabs.map((t) => (
             <button
               key={t.id}
               onClick={() => onTabChange(t.id)}
-              className={`font-body text-xs md:text-sm tracking-widest uppercase px-3 md:px-5 py-2 rounded-full transition-all ${
+              className={`font-body text-[10px] md:text-xs tracking-widest uppercase px-2 md:px-4 py-1.5 md:py-2 rounded-full transition-all whitespace-nowrap flex-shrink-0 ${
                 activeTab === t.id
                   ? "bg-gold/20 text-gold-accent border border-gold/40"
                   : "text-muted-foreground hover:text-cream-accent hover:bg-muted/20"
               }`}
             >
-              <span className="mr-1">{t.emoji}</span>
+              <span className="mr-0.5 md:mr-1">{t.emoji}</span>
               <span className="hidden sm:inline">{t.label}</span>
             </button>
           ))}
