@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { useRoom } from "@/contexts/RoomContext";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
+import { useNotifications } from "@/hooks/use-notifications";
 
 interface Reason {
   id: string;
@@ -10,6 +12,7 @@ interface Reason {
 
 const WhyYouSection = () => {
   const { roomId, me, members } = useRoom();
+  const { notify } = useNotifications();
   const [reasons, setReasons] = useState<Reason[]>([]);
   const [input, setInput] = useState("");
 
@@ -22,18 +25,43 @@ const WhyYouSection = () => {
     load();
   }, [roomId]);
 
+  // Realtime: listen for partner reason changes
+  useEffect(() => {
+    if (!roomId || !me) return;
+    const channel = supabase
+      .channel('reasons-changes')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'star_reasons', filter: `room_id=eq.${roomId}` }, (payload) => {
+        const newReason = payload.new as any;
+        if (newReason.member_id !== me.id) {
+          const partnerName = members.find(m => m.id === newReason.member_id)?.name || "Your partner";
+          notify("⭐ New reason added", `${partnerName} added: "${newReason.text}"`);
+          setReasons(prev => [...prev, { id: newReason.id, text: newReason.text, member_id: newReason.member_id }]);
+        }
+      })
+      .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'star_reasons', filter: `room_id=eq.${roomId}` }, (payload) => {
+        const old = payload.old as any;
+        setReasons(prev => prev.filter(r => r.id !== old.id));
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [roomId, me, members, notify]);
+
   const getMember = (id: string) => members.find((m) => m.id === id);
 
   const addReason = async () => {
     if (!input.trim() || !roomId || !me) return;
     const { data } = await supabase.from("star_reasons").insert({ room_id: roomId, member_id: me.id, text: input.trim() }).select().single();
-    if (data) setReasons((prev) => [...prev, { id: data.id, text: data.text, member_id: data.member_id }]);
+    if (data) {
+      setReasons((prev) => [...prev, { id: data.id, text: data.text, member_id: data.member_id }]);
+      toast({ title: "💫 Reason added", description: "Your reason has been saved" });
+    }
     setInput("");
   };
 
   const deleteReason = async (id: string) => {
     await supabase.from("star_reasons").delete().eq("id", id);
     setReasons((prev) => prev.filter((r) => r.id !== id));
+    toast({ title: "✕ Reason removed", description: "Your reason has been deleted" });
   };
 
   return (
