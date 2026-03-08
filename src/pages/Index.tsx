@@ -51,6 +51,14 @@ const IndexContent = () => {
         return <CountdownSection />;
       case "letters":
         return <LettersSection />;
+      case "goodnight":
+        return <GoodnightSection />;
+      case "red-string":
+        return <RedStringSection />;
+      case "heartbeat":
+        return <HeartbeatSection />;
+      case "wishes":
+        return <StarWishSection />;
       default:
         return <HeroSection onExplore={() => setActiveTab("why-you")} />;
     }
