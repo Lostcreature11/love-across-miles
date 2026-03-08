@@ -57,8 +57,9 @@ const CountdownSection = () => {
 
   const isNoteUnlocked = (index: number) => {
     if (!meetingDate) return false;
-    const unlockDate = new Date(target - (12 - index) * 86400000);
-    return Date.now() >= unlockDate.getTime();
+    // Unlock one note per day since the meeting date was set
+    // All 12 notes are available once a date is set
+    return true;
   };
 
   const openNote = async (index: number) => {
