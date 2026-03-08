@@ -17,6 +17,7 @@ interface RoomContextType {
   loading: boolean;
   createRoom: (name: string, pronoun: "she" | "he") => Promise<string>;
   joinRoom: (code: string, name: string, pronoun: "she" | "he") => Promise<boolean>;
+  leaveRoom: () => void;
   isReady: boolean;
 }
 
