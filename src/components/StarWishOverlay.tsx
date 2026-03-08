@@ -46,6 +46,7 @@ const StarWishOverlay = () => {
     setQueue(prev => prev.slice(1));
 
     // Shooting star phase
+    playTwinkle();
     setStarPhase("shooting");
     await new Promise(r => setTimeout(r, 1500));
     

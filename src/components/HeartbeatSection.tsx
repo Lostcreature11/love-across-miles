@@ -107,7 +107,7 @@ const HeartbeatSection = () => {
       await new Promise(r => setTimeout(r, pattern[i]));
       setPulseAnim(true);
       setActiveBar(i);
-      // Vibration API
+      playHeartbeat();
       if (navigator.vibrate) {
         navigator.vibrate(100);
       }

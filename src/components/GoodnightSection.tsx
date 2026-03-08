@@ -76,6 +76,7 @@ const GoodnightSection = () => {
           setOverlayData({ name: senderName, message: ritual.message });
           setShowOverlay(true);
           setLastReceived(ritual);
+          playChime();
           setTimeout(() => setShowOverlay(false), 6000);
         }
       })
