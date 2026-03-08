@@ -199,7 +199,7 @@ const DiarySection = () => {
               <div key={d} className="text-center text-xs text-muted-foreground font-body py-1">{d}</div>
             ))}
             {Array.from({ length: firstDay }).map((_, i) => <div key={`empty-${i}`} />)}
-            {Array.from({ length: daysInMonth }, (_, i) => {
+            {Array.from({ length: daysInMonth }, (_, i) => i + 1).map((day) => {
               const day = i + 1;
               const date = `${currentYear}-${String(currentMonth + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
               const dayEntries = getEntries(date);
