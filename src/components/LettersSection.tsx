@@ -109,7 +109,6 @@ const LettersSection = () => {
   };
 
   const received = letters.filter((l) => l.sender_id !== me?.id);
-  const sent = letters.filter((l) => l.sender_id === me?.id);
 
   return (
     <section className="min-h-screen px-4 py-8 max-w-2xl mx-auto">
