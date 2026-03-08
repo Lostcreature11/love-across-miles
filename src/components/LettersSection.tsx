@@ -177,39 +177,62 @@ const LettersSection = () => {
       )}
 
       {view === "inbox" && (
-        <div className="animate-fade-up space-y-8">
+        <div className="animate-fade-up">
           {loading ? (
             <p className="text-center text-gold-accent font-italic italic animate-pulse">Loading… ♡</p>
           ) : (
-            <>
-              {/* Received */}
-              <div>
-                <h3 className="font-display text-lg text-gold-accent mb-4 tracking-wider">💌 Received</h3>
+            <div className="flex flex-col items-center">
+              {/* Mailbox hero */}
+              <div className="relative mb-8">
+                <img src={mailboxImg} alt="Love mailbox" className="w-56 sm:w-64 mx-auto rounded-xl drop-shadow-lg" />
+                {/* Letter count badge */}
+                {received.filter(l => !l.opened).length > 0 && (
+                  <div className="absolute -top-2 -right-2 w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold animate-pulse shadow-lg" style={{ background: "#c04040" }}>
+                    {received.filter(l => !l.opened).length}
+                  </div>
+                )}
+              </div>
+
+              {/* Received letters spilling out of mailbox */}
+              <div className="w-full mb-10">
+                <h3 className="font-display text-lg text-gold-accent mb-4 tracking-wider text-center">💌 Received</h3>
                 {received.length === 0 ? (
-                  <p className="text-center text-muted-foreground font-italic italic text-sm py-8">No letters yet… maybe send one first? ♡</p>
+                  <p className="text-center text-muted-foreground font-italic italic text-sm py-6">Your mailbox is empty… send a letter to get one back ♡</p>
                 ) : (
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                    {received.map((letter) => (
-                      <EnvelopeCard key={letter.id} letter={letter} isSent={false} onClick={() => handleOpenLetter(letter)} />
+                  <div className="flex flex-wrap justify-center gap-4">
+                    {received.map((letter, i) => (
+                      <div
+                        key={letter.id}
+                        className="animate-fade-up"
+                        style={{ animationDelay: `${i * 0.08}s` }}
+                      >
+                        <MailboxEnvelope letter={letter} isSent={false} onClick={() => handleOpenLetter(letter)} />
+                      </div>
                     ))}
                   </div>
                 )}
               </div>
 
               {/* Sent */}
-              <div>
-                <h3 className="font-display text-lg text-gold-accent mb-4 tracking-wider">✉️ Sent</h3>
+              <div className="w-full">
+                <h3 className="font-display text-lg text-gold-accent mb-4 tracking-wider text-center">✉️ Sent</h3>
                 {sent.length === 0 ? (
-                  <p className="text-center text-muted-foreground font-italic italic text-sm py-8">You haven't sent any letters yet ✦</p>
+                  <p className="text-center text-muted-foreground font-italic italic text-sm py-6">You haven't sent any letters yet ✦</p>
                 ) : (
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                    {sent.map((letter) => (
-                      <EnvelopeCard key={letter.id} letter={letter} isSent={true} onClick={() => handleOpenLetter(letter)} />
+                  <div className="flex flex-wrap justify-center gap-4">
+                    {sent.map((letter, i) => (
+                      <div
+                        key={letter.id}
+                        className="animate-fade-up"
+                        style={{ animationDelay: `${i * 0.08}s` }}
+                      >
+                        <MailboxEnvelope letter={letter} isSent={true} onClick={() => handleOpenLetter(letter)} />
+                      </div>
                     ))}
                   </div>
                 )}
               </div>
-            </>
+            </div>
           )}
         </div>
       )}
