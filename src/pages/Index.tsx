@@ -6,6 +6,7 @@ import HeroSection from "@/components/HeroSection";
 import WhyYouSection from "@/components/WhyYouSection";
 import DiarySection from "@/components/DiarySection";
 import CountdownSection from "@/components/CountdownSection";
+import LettersSection from "@/components/LettersSection";
 import SetupFlow from "@/components/SetupFlow";
 import { useRoom } from "@/contexts/RoomContext";
 import { useEffect } from "react";
@@ -44,6 +45,8 @@ const IndexContent = () => {
         return <DiarySection />;
       case "countdown":
         return <CountdownSection />;
+      case "letters":
+        return <LettersSection />;
       default:
         return <HeroSection onExplore={() => setActiveTab("why-you")} />;
     }
