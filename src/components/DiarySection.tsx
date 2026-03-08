@@ -27,6 +27,8 @@ const TypewriterText = ({ text }: { text: string }) => {
   return <span>{displayed}</span>;
 };
 
+type DiaryMode = "calendar" | "write" | "read";
+
 const DiarySection = () => {
   const [entries, setEntries] = useState<DiaryEntry[]>(() => {
     try { return JSON.parse(localStorage.getItem(DIARY_KEY) || "[]"); } catch { return []; }
@@ -44,13 +46,13 @@ const DiarySection = () => {
   const [bookOpen, setBookOpen] = useState(false);
   const [herText, setHerText] = useState("");
   const [himText, setHimText] = useState("");
+  const [mode, setMode] = useState<DiaryMode>("calendar");
 
   useEffect(() => { localStorage.setItem(DIARY_KEY, JSON.stringify(entries)); }, [entries]);
   useEffect(() => { if (identity) localStorage.setItem(DIARY_IDENTITY, identity); }, [identity]);
   useEffect(() => { localStorage.setItem(DIARY_NAMES, JSON.stringify(names)); }, [names]);
 
   const today = new Date().toISOString().split("T")[0];
-
   const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
   const firstDay = new Date(currentYear, currentMonth, 1).getDay();
 
@@ -59,13 +61,14 @@ const DiarySection = () => {
   const herCount = entries.filter((e) => e.author === "her").length;
   const himCount = entries.filter((e) => e.author === "him").length;
 
-  const openDay = (day: number) => {
+  const openDay = (day: number, targetMode: DiaryMode) => {
     const date = `${currentYear}-${String(currentMonth + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
     setSelectedDate(date);
     const dayEntries = getEntries(date);
     setHerText(dayEntries.find((e) => e.author === "her")?.text || "");
     setHimText(dayEntries.find((e) => e.author === "him")?.text || "");
     setBookOpen(false);
+    setMode(targetMode);
   };
 
   const saveEntry = () => {
@@ -88,6 +91,11 @@ const DiarySection = () => {
   const confirmIdentity = (id: "her" | "him") => {
     setIdentity(id);
     setShowSetup(false);
+  };
+
+  const backToCalendar = () => {
+    setMode("calendar");
+    setSelectedDate(null);
   };
 
   return (
@@ -118,54 +126,113 @@ const DiarySection = () => {
         </div>
       )}
 
-      {/* Month nav */}
-      <div className="flex items-center justify-between mb-4">
-        <button onClick={() => { if (currentMonth === 0) { setCurrentMonth(11); setCurrentYear((y) => y - 1); } else setCurrentMonth((m) => m - 1); }} className="text-gold-accent text-sm font-body hover:text-cream-accent">← Prev</button>
-        <span className="font-display text-lg text-cream-accent">{MONTHS[currentMonth]} {currentYear}</span>
-        <button onClick={() => { if (currentMonth === 11) { setCurrentMonth(0); setCurrentYear((y) => y + 1); } else setCurrentMonth((m) => m + 1); }} className="text-gold-accent text-sm font-body hover:text-cream-accent">Next →</button>
-      </div>
+      {/* MODE: Calendar */}
+      {mode === "calendar" && (
+        <>
+          {/* Month nav */}
+          <div className="flex items-center justify-between mb-4">
+            <button onClick={() => { if (currentMonth === 0) { setCurrentMonth(11); setCurrentYear((y) => y - 1); } else setCurrentMonth((m) => m - 1); }} className="text-gold-accent text-sm font-body hover:text-cream-accent">← Prev</button>
+            <span className="font-display text-lg text-cream-accent">{MONTHS[currentMonth]} {currentYear}</span>
+            <button onClick={() => { if (currentMonth === 11) { setCurrentMonth(0); setCurrentYear((y) => y + 1); } else setCurrentMonth((m) => m + 1); }} className="text-gold-accent text-sm font-body hover:text-cream-accent">Next →</button>
+          </div>
 
-      {/* Calendar grid */}
-      <div className="grid grid-cols-7 gap-1 mb-4">
-        {DAYS.map((d) => (
-          <div key={d} className="text-center text-xs text-muted-foreground font-body py-1">{d}</div>
-        ))}
-        {Array.from({ length: firstDay }).map((_, i) => <div key={`empty-${i}`} />)}
-        {Array.from({ length: daysInMonth }, (_, i) => {
-          const day = i + 1;
-          const date = `${currentYear}-${String(currentMonth + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-          const dayEntries = getEntries(date);
-          const isToday = date === today;
-          return (
-            <button
-              key={day}
-              onClick={() => openDay(day)}
-              className={`relative aspect-square flex flex-col items-center justify-center rounded text-sm font-body transition-all hover:bg-muted/50 ${isToday ? "ring-1 ring-gold" : ""}`}
-            >
-              <span className="text-foreground">{day}</span>
-              <div className="flex gap-0.5 mt-0.5">
-                {dayEntries.some((e) => e.author === "her") && <span className="w-1.5 h-1.5 rounded-full bg-rose" />}
-                {dayEntries.some((e) => e.author === "him") && <span className="w-1.5 h-1.5 rounded-full bg-gold" />}
-              </div>
-            </button>
-          );
-        })}
-      </div>
+          {/* Calendar grid */}
+          <div className="grid grid-cols-7 gap-1 mb-4">
+            {DAYS.map((d) => (
+              <div key={d} className="text-center text-xs text-muted-foreground font-body py-1">{d}</div>
+            ))}
+            {Array.from({ length: firstDay }).map((_, i) => <div key={`empty-${i}`} />)}
+            {Array.from({ length: daysInMonth }, (_, i) => {
+              const day = i + 1;
+              const date = `${currentYear}-${String(currentMonth + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+              const dayEntries = getEntries(date);
+              const isToday = date === today;
+              const hasEntries = dayEntries.length > 0;
+              return (
+                <div
+                  key={day}
+                  className={`relative aspect-square flex flex-col items-center justify-center rounded text-sm font-body ${isToday ? "ring-1 ring-gold" : ""}`}
+                >
+                  <span className="text-foreground text-xs mb-1">{day}</span>
+                  <div className="flex gap-0.5 mb-1">
+                    {dayEntries.some((e) => e.author === "her") && <span className="w-1.5 h-1.5 rounded-full bg-rose" />}
+                    {dayEntries.some((e) => e.author === "him") && <span className="w-1.5 h-1.5 rounded-full bg-gold" />}
+                  </div>
+                  <div className="flex gap-1">
+                    {identity && (
+                      <button
+                        onClick={() => openDay(day, "write")}
+                        className="text-[8px] text-gold-accent hover:text-cream-accent transition-colors"
+                        title="Write"
+                      >
+                        ✎
+                      </button>
+                    )}
+                    {hasEntries && (
+                      <button
+                        onClick={() => openDay(day, "read")}
+                        className="text-[8px] text-rose-accent hover:text-cream-accent transition-colors"
+                        title="Read"
+                      >
+                        📖
+                      </button>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
 
-      {/* Stats */}
-      <div className="flex justify-center gap-6 text-xs font-body text-muted-foreground">
-        <span className="text-rose">{names.her}: {herCount}</span>
-        <span>Total: {entries.length}</span>
-        <span className="text-gold">{names.him}: {himCount}</span>
-      </div>
+          {/* Stats */}
+          <div className="flex justify-center gap-6 text-xs font-body text-muted-foreground">
+            <span className="text-rose">{names.her}: {herCount}</span>
+            <span>Total: {entries.length}</span>
+            <span className="text-gold">{names.him}: {himCount}</span>
+          </div>
+        </>
+      )}
 
-      {/* Diary Modal */}
-      {selectedDate && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" onClick={() => setSelectedDate(null)}>
-          <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" />
-          <div className="relative z-10" onClick={(e) => e.stopPropagation()}>
+      {/* MODE: Write */}
+      {mode === "write" && selectedDate && identity && (
+        <div className="animate-fade-up">
+          <button onClick={backToCalendar} className="text-gold-accent text-sm font-body mb-6 hover:text-cream-accent">← Back to Calendar</button>
+          
+          <div className="bg-parchment diary-page-lines rounded-lg p-8 max-w-lg mx-auto min-h-[400px]">
+            <p className="font-handwriting text-sm mb-1" style={{ color: "#3a2a1a" }}>{selectedDate}</p>
+            <p className={`font-handwriting text-sm mb-4 ${identity === "her" ? "text-rose" : "text-gold"}`}>
+              {identity === "her" ? names.her : names.him}'s entry
+            </p>
+            
+            <textarea
+              className="w-full bg-transparent font-handwriting text-lg leading-[32px] resize-none outline-none min-h-[250px]"
+              style={{ color: identity === "her" ? "#3a2a1a" : "#1a1a3a" }}
+              placeholder="Write your heart out…"
+              value={identity === "her" ? herText : himText}
+              onChange={(e) => identity === "her" ? setHerText(e.target.value) : setHimText(e.target.value)}
+            />
+            
+            <div className="flex gap-3 mt-4 pt-4" style={{ borderTop: "1px dashed #c0b090" }}>
+              <button onClick={() => { saveEntry(); backToCalendar(); }} className={`text-sm font-body px-4 py-2 rounded transition-opacity hover:opacity-90 ${identity === "her" ? "bg-rose/80 text-background" : "bg-gold/80 text-background"}`}>
+                Save ✦
+              </button>
+              <button onClick={() => { deleteEntry(); backToCalendar(); }} className="text-sm font-body px-4 py-2 bg-muted text-foreground rounded hover:opacity-80">
+                Delete
+              </button>
+              <button onClick={backToCalendar} className="text-sm font-body px-4 py-2 text-muted-foreground hover:text-foreground">
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODE: Read — diary book modal */}
+      {mode === "read" && selectedDate && (
+        <div className="animate-fade-up">
+          <button onClick={backToCalendar} className="text-gold-accent text-sm font-body mb-6 hover:text-cream-accent">← Back to Calendar</button>
+          
+          <div className="flex justify-center">
             {!bookOpen ? (
-              /* Closed diary */
               <button
                 onClick={() => setBookOpen(true)}
                 className="relative w-64 h-80 rounded-lg shadow-2xl flex flex-col items-center justify-center gap-4 transition-transform hover:scale-105"
@@ -177,12 +244,8 @@ const DiarySection = () => {
                 <span className="text-gold-accent text-xs font-italic italic animate-blink">tap to open ♡</span>
               </button>
             ) : (
-              /* Open book */
-              <div className="animate-book-open">
-                <div className="flex flex-col md:flex-row w-[90vw] max-w-3xl max-h-[80vh] rounded-lg overflow-hidden shadow-2xl">
-                  {/* Close button */}
-                  <button onClick={() => setSelectedDate(null)} className="absolute -top-8 right-0 text-gold-accent text-sm font-body hover:text-cream-accent z-20">Close ✕</button>
-
+              <div className="animate-book-open w-full">
+                <div className="flex flex-col md:flex-row w-full max-w-3xl mx-auto max-h-[70vh] rounded-lg overflow-hidden shadow-2xl">
                   {/* Her page */}
                   <div className="flex-1 bg-parchment diary-page-lines p-6 overflow-y-auto min-h-[300px] md:min-h-[400px]">
                     <p className="font-handwriting text-sm" style={{ color: "#3a2a1a" }}>{selectedDate}</p>
@@ -193,22 +256,6 @@ const DiarySection = () => {
                       </p>
                     ) : (
                       <p className="font-italic italic text-sm" style={{ color: "#8a7a6a" }}>No entry yet for this day… come back when your heart is full.</p>
-                    )}
-                    {identity === "her" && (
-                      <div className="mt-4 space-y-2">
-                        <textarea
-                          className="w-full bg-transparent font-handwriting text-base leading-8 resize-none outline-none border-b border-dashed"
-                          style={{ color: "#3a2a1a", borderColor: "#c0b090" }}
-                          rows={4}
-                          placeholder="Write your heart out…"
-                          value={herText}
-                          onChange={(e) => setHerText(e.target.value)}
-                        />
-                        <div className="flex gap-2">
-                          <button onClick={saveEntry} className="text-xs font-body px-3 py-1 bg-rose/80 text-background rounded">Save</button>
-                          <button onClick={deleteEntry} className="text-xs font-body px-3 py-1 bg-muted text-foreground rounded">Delete</button>
-                        </div>
-                      </div>
                     )}
                   </div>
 
@@ -225,22 +272,6 @@ const DiarySection = () => {
                       </p>
                     ) : (
                       <p className="font-italic italic text-sm" style={{ color: "#8a7a6a" }}>No entry yet for this day… come back when your heart is full.</p>
-                    )}
-                    {identity === "him" && (
-                      <div className="mt-4 space-y-2">
-                        <textarea
-                          className="w-full bg-transparent font-handwriting text-base leading-8 resize-none outline-none border-b border-dashed"
-                          style={{ color: "#1a1a3a", borderColor: "#c0b090" }}
-                          rows={4}
-                          placeholder="Write your heart out…"
-                          value={himText}
-                          onChange={(e) => setHimText(e.target.value)}
-                        />
-                        <div className="flex gap-2">
-                          <button onClick={saveEntry} className="text-xs font-body px-3 py-1 bg-gold/80 text-background rounded">Save</button>
-                          <button onClick={deleteEntry} className="text-xs font-body px-3 py-1 bg-muted text-foreground rounded">Delete</button>
-                        </div>
-                      </div>
                     )}
                   </div>
                 </div>
