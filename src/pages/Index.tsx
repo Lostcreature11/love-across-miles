@@ -68,6 +68,7 @@ const IndexContent = () => {
     <div className="relative min-h-screen bg-background overflow-x-hidden">
       <Starfield />
       <CustomCursor />
+      <StarWishOverlay />
       <div className="grain-overlay" />
       {activeTab !== "prologue" && <Navbar activeTab={activeTab} onTabChange={setActiveTab} />}
       

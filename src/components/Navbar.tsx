@@ -16,6 +16,10 @@ const tabs = [
   { id: "our-diary", label: "Diary", emoji: "📖" },
   { id: "countdown", label: "Countdown", emoji: "⏳" },
   { id: "letters", label: "Letters", emoji: "💌" },
+  { id: "goodnight", label: "Goodnight", emoji: "🌙" },
+  { id: "red-string", label: "Red String", emoji: "🔴" },
+  { id: "heartbeat", label: "Heartbeat", emoji: "🫀" },
+  { id: "wishes", label: "Wishes", emoji: "💫" },
 ];
 
 interface NavbarProps {
