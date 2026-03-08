@@ -250,20 +250,6 @@ const LettersSection = () => {
                 )}
               </div>
 
-              <div className="w-full">
-                <h3 className="font-display text-lg text-gold-accent mb-4 tracking-wider text-center">✉️ Sent</h3>
-                {sent.length === 0 ? (
-                  <p className="text-center text-muted-foreground font-italic italic text-sm py-6">You haven't sent any letters yet ✦</p>
-                ) : (
-                  <div className="flex flex-wrap justify-center gap-4">
-                    {sent.map((letter, i) => (
-                      <div key={letter.id} className="opacity-0" style={{ animation: `mailboxSpill 0.7s cubic-bezier(.34,1.56,.64,1) ${0.3 + i * 0.12}s forwards` }}>
-                        <MailboxEnvelope letter={letter} isSent={true} onClick={() => handleOpenLetter(letter)} />
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
             </div>
           )}
         </div>
