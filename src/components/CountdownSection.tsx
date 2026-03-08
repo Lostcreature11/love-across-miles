@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { useRoom } from "@/contexts/RoomContext";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
+import { useNotifications } from "@/hooks/use-notifications";
 
 const LOVE_NOTES = [
   `"Love is the emblem of eternity; it confounds all notion of time; effaces all memory of a beginning, all fear of an end."\n— Anne Louise Germaine de Staël, Corinne`,
@@ -18,7 +20,8 @@ const LOVE_NOTES = [
 ];
 
 const CountdownSection = () => {
-  const { roomId } = useRoom();
+  const { roomId, me, members } = useRoom();
+  const { notify } = useNotifications();
   const [meetingDate, setMeetingDate] = useState("");
   const [dateInput, setDateInput] = useState("");
   const [now, setNow] = useState(Date.now());
@@ -37,6 +40,32 @@ const CountdownSection = () => {
     load();
   }, [roomId]);
 
+  // Realtime: listen for room changes (countdown date, opened notes)
+  useEffect(() => {
+    if (!roomId || !me) return;
+    const channel = supabase
+      .channel('room-changes')
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'rooms', filter: `id=eq.${roomId}` }, (payload) => {
+        const updated = payload.new as any;
+        if (updated.countdown_date && updated.countdown_date !== meetingDate) {
+          const partnerName = members.find(m => m.id !== me.id)?.name || "Your partner";
+          notify("📅 Countdown updated", `${partnerName} set the meeting date to ${updated.countdown_date}`);
+          setMeetingDate(updated.countdown_date);
+          setDateInput(updated.countdown_date);
+        }
+        if (updated.opened_notes) {
+          const newNotes = (updated.opened_notes as number[]).filter(n => !openedNotes.includes(n));
+          if (newNotes.length > 0) {
+            const partnerName = members.find(m => m.id !== me.id)?.name || "Your partner";
+            notify("💌 Love note opened", `${partnerName} opened love note #${newNotes[newNotes.length - 1] + 1}`);
+          }
+          setOpenedNotes(updated.opened_notes as number[]);
+        }
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [roomId, me, members, meetingDate, openedNotes, notify]);
+
   useEffect(() => {
     const iv = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(iv);
@@ -46,6 +75,7 @@ const CountdownSection = () => {
     if (!dateInput || !roomId) return;
     await supabase.from("rooms").update({ countdown_date: dateInput }).eq("id", roomId);
     setMeetingDate(dateInput);
+    toast({ title: "📅 Date saved", description: `Meeting date set to ${dateInput}` });
   };
 
   const target = meetingDate ? new Date(meetingDate + "T00:00:00").getTime() : 0;
@@ -57,8 +87,6 @@ const CountdownSection = () => {
 
   const isNoteUnlocked = (index: number) => {
     if (!meetingDate) return false;
-    // Unlock one note per day since the meeting date was set
-    // All 12 notes are available once a date is set
     return true;
   };
 
@@ -68,6 +96,7 @@ const CountdownSection = () => {
       const updated = [...openedNotes, index];
       setOpenedNotes(updated);
       await supabase.from("rooms").update({ opened_notes: updated }).eq("id", roomId);
+      toast({ title: "💌 Note opened", description: `Love note #${index + 1} revealed` });
     }
     setActiveNote(index);
   };
@@ -79,7 +108,6 @@ const CountdownSection = () => {
         The <span className="italic text-rose-accent">Countdown</span>
       </h2>
 
-      {/* Date input row */}
       <div className="flex flex-wrap items-center justify-center gap-4 mb-12">
         <span className="text-muted-foreground text-xs font-body uppercase tracking-widest">Set your meeting date:</span>
         <input
@@ -96,7 +124,6 @@ const CountdownSection = () => {
         </button>
       </div>
 
-      {/* Countdown display - always visible */}
       <div className="flex justify-center gap-8 md:gap-16 mb-6">
         {[
           { val: meetingDate ? days : null, label: "Days" },
@@ -119,7 +146,6 @@ const CountdownSection = () => {
           : "Set a date above to begin the countdown ♡"}
       </p>
 
-      {/* Love Notes */}
       <h3 className="font-italic italic text-lg text-cream-accent mb-8">Love notes — open one each day ♡</h3>
       <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3 max-w-2xl mx-auto">
         {LOVE_NOTES.map((_, i) => {
@@ -146,7 +172,6 @@ const CountdownSection = () => {
         })}
       </div>
 
-      {/* Note modal */}
       {activeNote !== null && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" onClick={() => setActiveNote(null)}>
           <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" />

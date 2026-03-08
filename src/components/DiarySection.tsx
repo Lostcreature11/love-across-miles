@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRoom } from "@/contexts/RoomContext";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
+import { useNotifications } from "@/hooks/use-notifications";
 
 interface DiaryEntry {
   id: string;
@@ -30,6 +32,7 @@ type DiaryMode = "calendar" | "write" | "read";
 
 const DiarySection = () => {
   const { roomId, me, members } = useRoom();
+  const { notify } = useNotifications();
   const [entries, setEntries] = useState<DiaryEntry[]>([]);
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
@@ -46,6 +49,35 @@ const DiarySection = () => {
     };
     load();
   }, [roomId]);
+
+  // Realtime: listen for partner diary changes
+  useEffect(() => {
+    if (!roomId || !me) return;
+    const channel = supabase
+      .channel('diary-changes')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'diary_entries', filter: `room_id=eq.${roomId}` }, (payload) => {
+        const newEntry = payload.new as any;
+        if (newEntry.member_id !== me.id) {
+          const partnerName = members.find(m => m.id === newEntry.member_id)?.name || "Your partner";
+          notify("💌 New diary entry", `${partnerName} wrote a diary entry for ${newEntry.date}`);
+          setEntries(prev => [...prev.filter(e => e.id !== newEntry.id), { id: newEntry.id, date: newEntry.date, member_id: newEntry.member_id, text: newEntry.text }]);
+        }
+      })
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'diary_entries', filter: `room_id=eq.${roomId}` }, (payload) => {
+        const updated = payload.new as any;
+        if (updated.member_id !== me.id) {
+          const partnerName = members.find(m => m.id === updated.member_id)?.name || "Your partner";
+          notify("✏️ Diary updated", `${partnerName} updated their entry for ${updated.date}`);
+        }
+        setEntries(prev => prev.map(e => e.id === updated.id ? { ...e, text: updated.text } : e));
+      })
+      .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'diary_entries', filter: `room_id=eq.${roomId}` }, (payload) => {
+        const old = payload.old as any;
+        setEntries(prev => prev.filter(e => e.id !== old.id));
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [roomId, me, members, notify]);
 
   const today = new Date().toISOString().split("T")[0];
   const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
@@ -74,15 +106,18 @@ const DiarySection = () => {
       if (myText.trim()) {
         await supabase.from("diary_entries").update({ text: myText.trim() }).eq("id", existing.id);
         setEntries((prev) => prev.map((e) => e.id === existing.id ? { ...e, text: myText.trim() } : e));
+        toast({ title: "✨ Entry updated", description: "Your diary entry has been saved" });
       } else {
         await supabase.from("diary_entries").delete().eq("id", existing.id);
         setEntries((prev) => prev.filter((e) => e.id !== existing.id));
+        toast({ title: "🗑️ Entry deleted", description: "Your diary entry has been removed" });
       }
     } else if (myText.trim()) {
       const { data } = await supabase.from("diary_entries")
         .insert({ room_id: roomId, member_id: me.id, date: selectedDate, text: myText.trim() })
         .select().single();
       if (data) setEntries((prev) => [...prev, { id: data.id, date: data.date, member_id: data.member_id, text: data.text }]);
+      toast({ title: "💌 Entry saved", description: `Your diary entry for ${selectedDate} has been saved` });
     }
     setMode("calendar");
     setSelectedDate(null);
@@ -94,6 +129,7 @@ const DiarySection = () => {
     if (existing) {
       await supabase.from("diary_entries").delete().eq("id", existing.id);
       setEntries((prev) => prev.filter((e) => e.id !== existing.id));
+      toast({ title: "🗑️ Entry deleted", description: "Your diary entry has been removed" });
     }
     setMyText("");
     setMode("calendar");
@@ -192,7 +228,6 @@ const DiarySection = () => {
             ) : (
               <div className="animate-book-open w-full">
                 <div className="flex flex-col md:flex-row w-full max-w-3xl mx-auto max-h-[70vh] rounded-lg overflow-hidden shadow-2xl">
-                  {/* Her page */}
                   <div className="flex-1 bg-parchment diary-page-lines p-6 overflow-y-auto min-h-[300px] md:min-h-[400px]">
                     <p className="font-handwriting text-sm" style={{ color: "#3a2a1a" }}>{selectedDate}</p>
                     <p className="font-handwriting text-rose text-sm mb-3">{sheMember?.name || "Her"}</p>
@@ -206,7 +241,6 @@ const DiarySection = () => {
                     })()}
                   </div>
                   <div className="w-full md:w-3 h-3 md:h-auto flex-shrink-0" style={{ background: "#0d0805" }} />
-                  {/* His page */}
                   <div className="flex-1 bg-parchment diary-page-lines p-6 overflow-y-auto min-h-[300px] md:min-h-[400px]">
                     <p className="font-handwriting text-sm" style={{ color: "#3a2a1a" }}>{selectedDate}</p>
                     <p className="font-handwriting text-gold text-sm mb-3">{heMember?.name || "Him"}</p>
