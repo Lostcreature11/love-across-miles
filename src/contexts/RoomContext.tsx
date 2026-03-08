@@ -23,7 +23,7 @@ interface RoomContextType {
 
 const RoomContext = createContext<RoomContextType>({
   roomId: null, roomCode: null, me: null, partner: null, members: [], loading: true,
-  createRoom: async () => "", joinRoom: async () => false, isReady: false,
+  createRoom: async () => "", joinRoom: async () => false, leaveRoom: () => {}, isReady: false,
 });
 
 export const useRoom = () => useContext(RoomContext);
