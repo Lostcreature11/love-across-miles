@@ -54,9 +54,9 @@ const IndexContent = () => {
       <Starfield />
       <CustomCursor />
       <div className="grain-overlay" />
-      <Navbar activeTab={activeTab} onTabChange={setActiveTab} />
+      {activeTab !== "prologue" && <Navbar activeTab={activeTab} onTabChange={setActiveTab} />}
       
-      <div className="pt-16 min-h-screen">
+      <div className={`${activeTab !== "prologue" ? "pt-16" : ""} min-h-screen`}>
         <div className="animate-fade-up" key={activeTab}>
           {renderTab()}
         </div>
