@@ -3,18 +3,18 @@ import { useRoom } from "@/contexts/RoomContext";
 import { supabase } from "@/integrations/supabase/client";
 
 const LOVE_NOTES = [
-  "Good morning, love. Even before the sun rises, you're the first thing on my mind. I hope today treats you as gently as you treat my heart. ☀️",
-  "Your voice is my favourite sound in this entire world. Even through a screen, it wraps around me like a blanket. I could listen to you forever. 🎧",
-  "You make me feel safe — not just physically, but emotionally. With you, I never have to pretend. You're my softest place to land. 🤍",
-  "I am so proud of you. Of everything you've done, everything you're becoming. Watching you grow is one of my greatest joys. 🌱",
-  "Late at night, when the world goes quiet, my thoughts always drift to you. I wonder if you're sleeping, if you're dreaming of us too. 🌙",
-  "It's the little things — the way you laugh, how you say my name, the random texts that make my whole day. You have no idea how much those moments mean to me. 💛",
-  "One week closer. Seven fewer days between us and the moment I finally get to hold you. Every second brings us nearer. ⏳",
-  "You are enough. More than enough. On your hard days, please remember that you are loved beyond measure — just as you are. 🫶",
-  "I think about our future constantly — our first morning together, cooking breakfast, falling asleep side by side. It's going to be so beautiful. 🏡",
-  "No reason. No occasion. I just wanted you to know: I love you. Deeply. Endlessly. Just because. 💌",
-  "If I had to choose again — a thousand times, a million lifetimes — I would still choose you. Every single time. Always you. ♾️",
-  "We're almost there. I can almost feel you. Hold on just a little longer, my love. The wait is almost over. 🤞✨",
+  `"Love is the emblem of eternity; it confounds all notion of time; effaces all memory of a beginning, all fear of an end."\n— Anne Louise Germaine de Staël, Corinne`,
+  `"He stepped down, trying not to look long at her, as if she were the sun, yet he saw her, like the sun, even without looking."\n— Leo Tolstoy, Anna Karenina`,
+  `"Whatever our souls are made out of, his and mine are the same."\n— Emily Brontë, Wuthering Heights`,
+  `"The minute I heard my first love story, I started looking for you."\n— Jalaluddin Rumi`,
+  `"He was my North, my South, my East and West, my working week and my Sunday rest."\n— W.H. Auden, Stop All the Clocks`,
+  `"I want to do with you what spring does with the cherry trees."\n— Pablo Neruda, Twenty Love Poems`,
+  `"I choose him over and over again, and he chooses me."\n— Veronica Roth, Allegiant`,
+  `"Each time you happen to me all over again."\n— Edith Wharton, The Age of Innocence`,
+  `"You could have had anything else in the world, and you asked for me."\n— Cassandra Clare, City of Glass`,
+  `"For the two of us, home isn't a place. It is a person. And we are finally home."\n— Stephanie Perkins, Anna and the French Kiss`,
+  `"I loved her against reason, against promise, against peace, against hope, against happiness, against all discouragement that could be."\n— Charles Dickens, Great Expectations`,
+  `"Who, being loved, is poor?"\n— Oscar Wilde, A Woman of No Importance`,
 ];
 
 const CountdownSection = () => {
