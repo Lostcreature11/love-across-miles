@@ -144,7 +144,7 @@ const SetupFlow = () => {
                 onClick={() => setPronoun("he")}
                 className={`px-5 py-2 rounded-lg text-sm font-body transition-all ${pronoun === "he" ? "bg-gold text-background" : "bg-input text-foreground hover:bg-gold/30"}`}
               >
-                He / Him ✦
+                He / Him 🫣👨‍🦰👑🦢
               </button>
             </div>
             {error && <p className="text-destructive text-xs">{error}</p>}
