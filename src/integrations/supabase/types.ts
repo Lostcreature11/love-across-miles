@@ -14,7 +14,149 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      diary_entries: {
+        Row: {
+          created_at: string
+          date: string
+          id: string
+          member_id: string
+          room_id: string
+          text: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          date: string
+          id?: string
+          member_id: string
+          room_id: string
+          text: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          id?: string
+          member_id?: string
+          room_id?: string
+          text?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "diary_entries_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "room_members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "diary_entries_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      room_members: {
+        Row: {
+          created_at: string
+          id: string
+          member_token: string
+          name: string
+          pronoun: string
+          room_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          member_token?: string
+          name: string
+          pronoun: string
+          room_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          member_token?: string
+          name?: string
+          pronoun?: string
+          room_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "room_members_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rooms: {
+        Row: {
+          code: string
+          countdown_date: string | null
+          created_at: string
+          id: string
+          opened_notes: number[] | null
+        }
+        Insert: {
+          code?: string
+          countdown_date?: string | null
+          created_at?: string
+          id?: string
+          opened_notes?: number[] | null
+        }
+        Update: {
+          code?: string
+          countdown_date?: string | null
+          created_at?: string
+          id?: string
+          opened_notes?: number[] | null
+        }
+        Relationships: []
+      }
+      star_reasons: {
+        Row: {
+          created_at: string
+          id: string
+          member_id: string
+          room_id: string
+          text: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          member_id: string
+          room_id: string
+          text: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          member_id?: string
+          room_id?: string
+          text?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "star_reasons_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "room_members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "star_reasons_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
