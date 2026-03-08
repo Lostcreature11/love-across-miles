@@ -16,7 +16,6 @@ interface Props {
 
 const LetterOpeningFlow = ({ letter, onClose }: Props) => {
   const [stage, setStage] = useState(1);
-  const [hearts, setHearts] = useState<{ id: number; x: number; emoji: string; delay: number }[]>([]);
 
   // Stage 1 auto-advance after 2s
   useEffect(() => {
@@ -31,21 +30,6 @@ const LetterOpeningFlow = ({ letter, onClose }: Props) => {
     if (stage === 3) {
       const t = setTimeout(() => setStage(4), 1800);
       return () => clearTimeout(t);
-    }
-  }, [stage]);
-
-  // Stage 4 — burst hearts
-  useEffect(() => {
-    if (stage === 4) {
-      const emojis = ["💕", "🌸", "💗", "🌹", "✨", "💖", "🌺"];
-      setHearts(
-        Array.from({ length: 14 }, (_, i) => ({
-          id: i,
-          x: Math.random() * 90 + 5,
-          emoji: emojis[i % emojis.length],
-          delay: Math.random() * 0.8,
-        }))
-      );
     }
   }, [stage]);
 
@@ -261,20 +245,6 @@ const LetterOpeningFlow = ({ letter, onClose }: Props) => {
             </div>
           </div>
 
-          {/* Floating hearts */}
-          {hearts.map((h) => (
-            <span
-              key={h.id}
-              className="absolute text-2xl pointer-events-none"
-              style={{
-                left: `${h.x}%`,
-                bottom: 0,
-                animation: `floatUp 3s ease-out ${h.delay}s both`,
-              }}
-            >
-              {h.emoji}
-            </span>
-          ))}
         </div>
       )}
 
