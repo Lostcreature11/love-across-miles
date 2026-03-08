@@ -320,46 +320,4 @@ const LettersSection = () => {
   );
 };
 
-const MailboxEnvelope = ({ letter, isSent, onClick }: { letter: LoveLetter; isSent: boolean; onClick: () => void }) => {
-  const isOpened = isSent || letter.opened;
-  return (
-    <button
-      onClick={onClick}
-      className="group relative w-32 sm:w-36 transition-all hover:scale-105 hover:-translate-y-1"
-    >
-      {/* Envelope shape */}
-      <div
-        className="relative w-full h-24 rounded-md shadow-md overflow-hidden"
-        style={{
-          background: isOpened ? "#fffdf8" : "#f5d5d5",
-          border: `1.5px solid ${isOpened ? "#d4a574" : "#c97070"}`,
-        }}
-      >
-        {/* Flap triangle */}
-        <div className="absolute top-0 left-0 w-full" style={{ height: 0, borderLeft: "64px solid transparent", borderRight: "64px solid transparent", borderTop: `28px solid ${isOpened ? "#e8d8c8" : "#e8b8b8"}` }} />
-        {/* Heart seal */}
-        {!isOpened && (
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-7 h-7 rounded-full flex items-center justify-center shadow-sm animate-pulse" style={{ background: "#c04040" }}>
-            <span className="text-white text-xs">♡</span>
-          </div>
-        )}
-        {isOpened && (
-          <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-2xl opacity-40">💌</span>
-        )}
-      </div>
-      {/* Label */}
-      <p className="mt-2 text-xs text-muted-foreground font-italic italic truncate">
-        {isSent ? `To ${letter.to_name}` : `From ${letter.from_name}`}
-      </p>
-      <p className="text-[10px] text-muted-foreground/50">
-        {new Date(letter.created_at).toLocaleDateString()}
-      </p>
-      {/* Unread dot */}
-      {!isOpened && (
-        <span className="absolute -top-1 -right-1 w-3 h-3 bg-[#c04040] rounded-full animate-pulse shadow" />
-      )}
-    </button>
-  );
-};
-
 export default LettersSection;
