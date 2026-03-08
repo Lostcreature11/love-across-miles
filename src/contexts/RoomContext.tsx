@@ -45,6 +45,31 @@ export const RoomProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
+  // Realtime: listen for new members joining the room
+  useEffect(() => {
+    if (!roomId || !me) return;
+    const channel = supabase
+      .channel('members-changes')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'room_members', filter: `room_id=eq.${roomId}` }, (payload) => {
+        const newMember = payload.new as any;
+        if (newMember.id !== me.id) {
+          const parsed: Member = {
+            id: newMember.id,
+            name: newMember.name,
+            pronoun: newMember.pronoun as "she" | "he",
+            member_token: newMember.member_token,
+          };
+          setPartner(parsed);
+          setMembers(prev => {
+            if (prev.some(m => m.id === parsed.id)) return prev;
+            return [...prev, parsed];
+          });
+        }
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [roomId, me]);
+
   const restoreSession = async (token: string) => {
     const { data: member } = await supabase
       .from("room_members")
