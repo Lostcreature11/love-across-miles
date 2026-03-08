@@ -1,12 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRoom } from "@/contexts/RoomContext";
 
 const SetupFlow = () => {
   const { createRoom, joinRoom, loading } = useRoom();
-  const [step, setStep] = useState<"choice" | "create" | "join">("choice");
+  const pendingCode = localStorage.getItem("pending_room_code") || "";
+  const [step, setStep] = useState<"choice" | "create" | "join">(pendingCode ? "join" : "choice");
   const [name, setName] = useState("");
   const [pronoun, setPronoun] = useState<"she" | "he" | null>(null);
-  const [code, setCode] = useState("");
+  const [code, setCode] = useState(pendingCode);
   const [generatedCode, setGeneratedCode] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
