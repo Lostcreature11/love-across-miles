@@ -203,7 +203,7 @@ const LettersSection = () => {
                     return (
                       <div
                         key={letter.id}
-                        className="absolute cursor-pointer transition-all duration-300 hover:-translate-y-4 hover:z-30 opacity-0"
+                        className="absolute cursor-pointer transition-all duration-300 hover:-translate-y-4 hover:z-30 hover-wiggle opacity-0"
                         style={{
                           left: `calc(50% + ${offset}px)`,
                           bottom: `${peekHeight}px`,
