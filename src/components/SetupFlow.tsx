@@ -62,7 +62,7 @@ const SetupFlow = () => {
               onClick={() => setStep("join")}
               className="w-full py-3 bg-rose/20 border border-rose/40 rounded-lg text-rose-accent font-body hover:bg-rose/30 transition-colors"
             >
-              Join My Love 🌸
+              Join My Love 💋🦋
             </button>
           </div>
         )}
@@ -80,7 +80,7 @@ const SetupFlow = () => {
                 onClick={() => setPronoun("she")}
                 className={`px-5 py-2 rounded-lg text-sm font-body transition-all ${pronoun === "she" ? "bg-rose text-background" : "bg-input text-foreground hover:bg-rose/30"}`}
               >
-                She / Her 🌸
+                She / Her 💋👩‍🦰🦋
               </button>
               <button
                 onClick={() => setPronoun("he")}
@@ -138,7 +138,7 @@ const SetupFlow = () => {
                 onClick={() => setPronoun("she")}
                 className={`px-5 py-2 rounded-lg text-sm font-body transition-all ${pronoun === "she" ? "bg-rose text-background" : "bg-input text-foreground hover:bg-rose/30"}`}
               >
-                She / Her 🌸
+                She / Her 💋👩‍🦰🦋
               </button>
               <button
                 onClick={() => setPronoun("he")}
@@ -153,7 +153,7 @@ const SetupFlow = () => {
               disabled={!name.trim() || !pronoun || !code.trim() || submitting}
               className="w-full py-3 bg-rose text-background rounded-lg font-body hover:opacity-90 transition-opacity disabled:opacity-50"
             >
-              {submitting ? "Joining…" : "Join 🌸"}
+              {submitting ? "Joining…" : "Join 💋🦋"}
             </button>
             <button onClick={() => setStep("choice")} className="text-muted-foreground text-xs hover:text-foreground">← Back</button>
           </div>
