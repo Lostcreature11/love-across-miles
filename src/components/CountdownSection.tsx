@@ -79,7 +79,7 @@ const CountdownSection = () => {
 
       <div className="flex items-center justify-center gap-3 my-8">
         <input type="date" className="bg-input rounded px-3 py-2 text-sm text-foreground font-body" value={dateInput} onChange={(e) => setDateInput(e.target.value)} />
-        <button onClick={saveDate} className="px-4 py-2 bg-gold text-background rounded text-sm font-body hover:opacity-90 transition-opacity">Save ✦</button>
+        <button onClick={saveDate} className="px-4 py-2 bg-gold text-background rounded text-sm font-body hover:opacity-90 transition-opacity">Save ✨🌙</button>
       </div>
 
       {meetingDate && (
