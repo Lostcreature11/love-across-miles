@@ -79,7 +79,7 @@ const CountdownSection = () => {
 
       <div className="flex items-center justify-center gap-3 my-8">
         <input type="date" className="bg-input rounded px-3 py-2 text-sm text-foreground font-body" value={dateInput} onChange={(e) => setDateInput(e.target.value)} />
-        <button onClick={saveDate} className="px-4 py-2 bg-gold text-background rounded text-sm font-body hover:opacity-90 transition-opacity">Save ✦</button>
+        <button onClick={saveDate} className="px-4 py-2 bg-gold text-background rounded text-sm font-body hover:opacity-90 transition-opacity">Save ✨🌙</button>
       </div>
 
       {meetingDate && (
@@ -101,7 +101,7 @@ const CountdownSection = () => {
               const opened = openedNotes.includes(i);
               return (
                 <button key={i} onClick={() => openNote(i)} className={`aspect-square rounded-lg flex flex-col items-center justify-center text-lg font-display transition-all relative ${opened ? "bg-rose/20 text-rose-accent" : unlocked ? "bg-gold/20 text-gold-accent hover:bg-gold/30" : "bg-muted/30 text-muted-foreground cursor-not-allowed"}`}>
-                  {opened ? "♡" : unlocked ? "✦" : "🔒"}
+                  {opened ? "💋" : unlocked ? "✨" : "🔒"}
                   <span className="text-[10px] font-body mt-1">{i + 1}</span>
                 </button>
               );
