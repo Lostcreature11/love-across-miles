@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRoom } from "@/contexts/RoomContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
@@ -27,34 +27,48 @@ const CountdownSection = () => {
   const [now, setNow] = useState(Date.now());
   const [openedNotes, setOpenedNotes] = useState<number[]>([]);
   const [activeNote, setActiveNote] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  // Refs for realtime callback to avoid stale closures
+  const meetingDateRef = useRef(meetingDate);
+  const openedNotesRef = useRef(openedNotes);
+  meetingDateRef.current = meetingDate;
+  openedNotesRef.current = openedNotes;
 
   useEffect(() => {
     if (!roomId) return;
     const load = async () => {
-      const { data } = await supabase.from("rooms").select("countdown_date, opened_notes").eq("id", roomId).single();
-      if (data) {
-        if (data.countdown_date) { setMeetingDate(data.countdown_date); setDateInput(data.countdown_date); }
-        if (data.opened_notes) setOpenedNotes(data.opened_notes as number[]);
+      try {
+        const { data, error } = await supabase.from("rooms").select("countdown_date, opened_notes").eq("id", roomId).single();
+        if (error) throw error;
+        if (data) {
+          if (data.countdown_date) { setMeetingDate(data.countdown_date); setDateInput(data.countdown_date); }
+          if (data.opened_notes) setOpenedNotes(data.opened_notes as number[]);
+        }
+      } catch {
+        toast({ title: "Error", description: "Failed to load countdown data", variant: "destructive" });
+      } finally {
+        setLoading(false);
       }
     };
     load();
   }, [roomId]);
 
-  // Realtime: listen for room changes (countdown date, opened notes)
+  // Realtime: listen for room changes — deps are only [roomId, me]
   useEffect(() => {
     if (!roomId || !me) return;
     const channel = supabase
       .channel('room-changes')
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'rooms', filter: `id=eq.${roomId}` }, (payload) => {
         const updated = payload.new as any;
-        if (updated.countdown_date && updated.countdown_date !== meetingDate) {
+        if (updated.countdown_date && updated.countdown_date !== meetingDateRef.current) {
           const partnerName = members.find(m => m.id !== me.id)?.name || "Your partner";
           notify("📅 Countdown updated", `${partnerName} set the meeting date to ${updated.countdown_date}`);
           setMeetingDate(updated.countdown_date);
           setDateInput(updated.countdown_date);
         }
         if (updated.opened_notes) {
-          const newNotes = (updated.opened_notes as number[]).filter(n => !openedNotes.includes(n));
+          const newNotes = (updated.opened_notes as number[]).filter(n => !openedNotesRef.current.includes(n));
           if (newNotes.length > 0) {
             const partnerName = members.find(m => m.id !== me.id)?.name || "Your partner";
             notify("💌 Love note opened", `${partnerName} opened love note #${newNotes[newNotes.length - 1] + 1}`);
@@ -64,7 +78,7 @@ const CountdownSection = () => {
       })
       .subscribe();
     return () => { supabase.removeChannel(channel); };
-  }, [roomId, me, members, meetingDate, openedNotes, notify]);
+  }, [roomId, me]);
 
   useEffect(() => {
     const iv = setInterval(() => setNow(Date.now()), 1000);
@@ -73,9 +87,14 @@ const CountdownSection = () => {
 
   const saveDate = async () => {
     if (!dateInput || !roomId) return;
-    await supabase.from("rooms").update({ countdown_date: dateInput }).eq("id", roomId);
-    setMeetingDate(dateInput);
-    toast({ title: "📅 Date saved", description: `Meeting date set to ${dateInput}` });
+    try {
+      const { error } = await supabase.from("rooms").update({ countdown_date: dateInput }).eq("id", roomId);
+      if (error) throw error;
+      setMeetingDate(dateInput);
+      toast({ title: "📅 Date saved", description: `Meeting date set to ${dateInput}` });
+    } catch {
+      toast({ title: "Error", description: "Failed to save date", variant: "destructive" });
+    }
   };
 
   const target = meetingDate ? new Date(meetingDate + "T00:00:00").getTime() : 0;
@@ -87,7 +106,8 @@ const CountdownSection = () => {
 
   const isNoteUnlocked = (index: number) => {
     if (!meetingDate) return false;
-    return true;
+    const daysSince = Math.floor((Date.now() - new Date(meetingDate + "T00:00:00").getTime()) / 86400000);
+    return daysSince > index;
   };
 
   const openNote = async (index: number) => {
@@ -95,11 +115,24 @@ const CountdownSection = () => {
     if (!openedNotes.includes(index)) {
       const updated = [...openedNotes, index];
       setOpenedNotes(updated);
-      await supabase.from("rooms").update({ opened_notes: updated }).eq("id", roomId);
-      toast({ title: "💌 Note opened", description: `Love note #${index + 1} revealed` });
+      try {
+        const { error } = await supabase.from("rooms").update({ opened_notes: updated }).eq("id", roomId);
+        if (error) throw error;
+        toast({ title: "💌 Note opened", description: `Love note #${index + 1} revealed` });
+      } catch {
+        toast({ title: "Error", description: "Failed to save note state", variant: "destructive" });
+      }
     }
     setActiveNote(index);
   };
+
+  if (loading) {
+    return (
+      <section className="relative z-10 py-24 px-4 max-w-3xl mx-auto text-center">
+        <p className="text-gold-accent font-italic italic animate-blink">Loading… ♡</p>
+      </section>
+    );
+  }
 
   return (
     <section id="countdown" className="relative z-10 py-24 px-4 max-w-3xl mx-auto text-center">

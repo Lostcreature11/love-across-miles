@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { useRoom } from "@/contexts/RoomContext";
+import { supabase } from "@/integrations/supabase/client";
 
 const SetupFlow = () => {
-  const { createRoom, joinRoom, loading } = useRoom();
+  const { createRoom, joinRoom, loading, roomId, partner } = useRoom();
   const pendingCode = localStorage.getItem("pending_room_code") || "";
   const [step, setStep] = useState<"choice" | "create" | "join">(pendingCode ? "join" : "choice");
   const [name, setName] = useState("");
@@ -19,6 +20,32 @@ const SetupFlow = () => {
       </div>
     );
   }
+
+  // If room is created and waiting for partner, show waiting screen
+  if (generatedCode && roomId && !partner) {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-4 relative z-10">
+        <div className="w-full max-w-md text-center space-y-6 animate-fade-up">
+          <p className="text-gold-accent uppercase tracking-[0.3em] text-xs font-body mb-4">Your space is ready</p>
+          <div className="bg-muted/30 backdrop-blur-sm rounded-lg p-6 border border-gold/30">
+            <p className="font-display text-4xl text-gold-accent tracking-[0.3em]">{generatedCode}</p>
+          </div>
+          <p className="text-muted-foreground text-xs font-body">Or share this link:</p>
+          <div className="bg-input rounded-lg p-3 text-xs text-foreground break-all font-body">
+            {window.location.origin}?code={generatedCode}
+          </div>
+          <div className="flex items-center justify-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-gold-accent animate-pulse" />
+            <p className="text-gold-accent font-italic italic text-sm animate-blink">
+              Waiting for your love to join… ♡
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // If partner joined, the parent (Index) will show the main app via isReady
 
   const handleCreate = async () => {
     if (!name.trim() || !pronoun) return;
@@ -50,7 +77,7 @@ const SetupFlow = () => {
           "Distance means so little when someone means so much."
         </p>
 
-        {step === "choice" && !generatedCode && (
+        {step === "choice" && (
           <div className="space-y-4">
             <button
               onClick={() => setStep("create")}
@@ -67,7 +94,7 @@ const SetupFlow = () => {
           </div>
         )}
 
-        {step === "create" && !generatedCode && (
+        {step === "create" && (
           <div className="space-y-4">
             <input
               className="w-full bg-input rounded-lg px-4 py-3 text-foreground font-body text-center"
@@ -97,24 +124,6 @@ const SetupFlow = () => {
               {submitting ? "Creating…" : "Create 🦢✨"}
             </button>
             <button onClick={() => setStep("choice")} className="text-muted-foreground text-xs hover:text-foreground">← Back</button>
-          </div>
-        )}
-
-        {generatedCode && (
-          <div className="space-y-6 animate-fade-up">
-            <p className="text-cream-accent font-italic italic text-sm">Your space is ready! Share this code with your love:</p>
-            <div className="bg-muted/30 backdrop-blur-sm rounded-lg p-6 border border-gold/30">
-              <p className="font-display text-4xl text-gold-accent tracking-[0.3em]">{generatedCode}</p>
-            </div>
-            <p className="text-muted-foreground text-xs font-body">
-              Or share this link:
-            </p>
-            <div className="bg-input rounded-lg p-3 text-xs text-foreground break-all font-body">
-              {window.location.origin}?code={generatedCode}
-            </div>
-            <p className="text-muted-foreground text-xs font-italic italic">
-              Waiting for your partner to join… refresh after they do ♡
-            </p>
           </div>
         )}
 
