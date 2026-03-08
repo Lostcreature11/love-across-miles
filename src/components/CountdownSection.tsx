@@ -72,48 +72,84 @@ const CountdownSection = () => {
   };
 
   return (
-    <section id="countdown" className="relative z-10 py-24 px-4 max-w-2xl mx-auto text-center">
-      <h2 className="font-display text-4xl md:text-5xl text-cream-accent mb-2">
+    <section id="countdown" className="relative z-10 py-24 px-4 max-w-3xl mx-auto text-center">
+      <p className="text-gold-accent uppercase tracking-[0.3em] text-xs font-body mb-6">Until We Meet</p>
+      <h2 className="font-display text-4xl md:text-5xl text-cream-accent mb-10">
         The <span className="italic text-rose-accent">Countdown</span>
       </h2>
 
-      <div className="flex items-center justify-center gap-3 my-8">
-        <input type="date" className="bg-input rounded px-3 py-2 text-sm text-foreground font-body" value={dateInput} onChange={(e) => setDateInput(e.target.value)} />
-        <button onClick={saveDate} className="px-4 py-2 bg-gold text-background rounded text-sm font-body hover:opacity-90 transition-opacity">Save ✨🌙</button>
+      {/* Date input row */}
+      <div className="flex flex-wrap items-center justify-center gap-4 mb-12">
+        <span className="text-muted-foreground text-xs font-body uppercase tracking-widest">Set your meeting date:</span>
+        <input
+          type="date"
+          className="bg-input border border-border rounded px-4 py-2.5 text-sm text-foreground font-body"
+          value={dateInput}
+          onChange={(e) => setDateInput(e.target.value)}
+        />
+        <button
+          onClick={saveDate}
+          className="px-6 py-2.5 bg-gold text-background rounded text-sm font-body uppercase tracking-wider hover:opacity-90 transition-opacity"
+        >
+          Save ✦
+        </button>
       </div>
 
-      {meetingDate && (
-        <>
-          <div className="flex justify-center gap-6 md:gap-10 mb-4">
-            {[{ val: days, label: "Days" }, { val: hours, label: "Hours" }, { val: minutes, label: "Minutes" }, { val: seconds, label: "Seconds" }].map((item) => (
-              <div key={item.label} className="flex flex-col items-center">
-                <span className="font-display text-4xl md:text-6xl text-gold-accent">{String(item.val).padStart(2, "0")}</span>
-                <span className="text-xs text-muted-foreground font-body uppercase tracking-wider">{item.label}</span>
-              </div>
-            ))}
+      {/* Countdown display - always visible */}
+      <div className="flex justify-center gap-8 md:gap-16 mb-6">
+        {[
+          { val: meetingDate ? days : null, label: "Days" },
+          { val: meetingDate ? hours : null, label: "Hours" },
+          { val: meetingDate ? minutes : null, label: "Minutes" },
+          { val: meetingDate ? seconds : null, label: "Seconds" },
+        ].map((item) => (
+          <div key={item.label} className="flex flex-col items-center">
+            <span className="font-display text-5xl md:text-7xl text-gold-accent leading-none mb-2">
+              {item.val !== null ? String(item.val).padStart(2, "0") : "—"}
+            </span>
+            <span className="text-[10px] text-muted-foreground font-body uppercase tracking-[0.25em]">{item.label}</span>
           </div>
-          <p className="font-italic italic text-muted-foreground text-sm mb-12">{days} days until I'm finally in your arms ♡</p>
+        ))}
+      </div>
 
-          <h3 className="font-display text-lg text-cream-accent mb-6">Love notes — open one each day ♡</h3>
-          <div className="grid grid-cols-4 md:grid-cols-6 gap-3">
-            {LOVE_NOTES.map((_, i) => {
-              const unlocked = isNoteUnlocked(i);
-              const opened = openedNotes.includes(i);
-              return (
-                <button key={i} onClick={() => openNote(i)} className={`aspect-square rounded-lg flex flex-col items-center justify-center text-lg font-display transition-all relative ${opened ? "bg-rose/20 text-rose-accent" : unlocked ? "bg-gold/20 text-gold-accent hover:bg-gold/30" : "bg-muted/30 text-muted-foreground cursor-not-allowed"}`}>
-                  {opened ? "💋" : unlocked ? "✨" : "🔒"}
-                  <span className="text-[10px] font-body mt-1">{i + 1}</span>
-                </button>
-              );
-            })}
-          </div>
-        </>
-      )}
+      <p className="font-italic italic text-muted-foreground text-sm mb-16">
+        {meetingDate
+          ? `${days} days until I'm finally in your arms ♡`
+          : "Set a date above to begin the countdown ♡"}
+      </p>
 
+      {/* Love Notes */}
+      <h3 className="font-italic italic text-lg text-cream-accent mb-8">Love notes — open one each day ♡</h3>
+      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3 max-w-2xl mx-auto">
+        {LOVE_NOTES.map((_, i) => {
+          const unlocked = isNoteUnlocked(i);
+          const opened = openedNotes.includes(i);
+          return (
+            <button
+              key={i}
+              onClick={() => openNote(i)}
+              className={`relative aspect-square rounded border flex flex-col items-center justify-center transition-all ${
+                opened
+                  ? "border-rose/60 bg-rose/10"
+                  : unlocked
+                  ? "border-gold/60 bg-gold/5 hover:bg-gold/15 hover:border-gold"
+                  : "border-border/40 bg-muted/10 cursor-not-allowed opacity-50"
+              }`}
+            >
+              <span className="font-display text-lg text-gold-accent">{i + 1}</span>
+              <span className="text-[10px] mt-0.5">
+                {opened ? <span className="text-rose-accent">♡</span> : unlocked ? <span className="text-gold-accent">✦</span> : null}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Note modal */}
       {activeNote !== null && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" onClick={() => setActiveNote(null)}>
           <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" />
-          <div className="relative z-10 animate-envelope bg-card rounded-lg p-8 max-w-md w-full text-center" onClick={(e) => e.stopPropagation()}>
+          <div className="relative z-10 animate-envelope bg-card border border-gold/30 rounded-lg p-8 max-w-md w-full text-center" onClick={(e) => e.stopPropagation()}>
             <div className="text-5xl mb-4">💌</div>
             <p className="font-italic italic text-foreground leading-relaxed text-sm">{LOVE_NOTES[activeNote]}</p>
             <button onClick={() => setActiveNote(null)} className="mt-6 text-gold-accent text-xs font-body hover:text-cream-accent">Close ✕</button>
