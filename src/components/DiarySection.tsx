@@ -40,17 +40,25 @@ const DiarySection = () => {
   const [bookOpen, setBookOpen] = useState(false);
   const [myText, setMyText] = useState("");
   const [mode, setMode] = useState<DiaryMode>("calendar");
+  const [loading, setLoading] = useState(true);
+  const [popoverDay, setPopoverDay] = useState<number | null>(null);
 
   useEffect(() => {
     if (!roomId) return;
     const load = async () => {
-      const { data } = await supabase.from("diary_entries").select("*").eq("room_id", roomId);
-      if (data) setEntries(data.map((e) => ({ id: e.id, date: e.date, member_id: e.member_id, text: e.text })));
+      try {
+        const { data, error } = await supabase.from("diary_entries").select("*").eq("room_id", roomId);
+        if (error) throw error;
+        if (data) setEntries(data.map((e) => ({ id: e.id, date: e.date, member_id: e.member_id, text: e.text })));
+      } catch {
+        toast({ title: "Error", description: "Failed to load diary entries", variant: "destructive" });
+      } finally {
+        setLoading(false);
+      }
     };
     load();
   }, [roomId]);
 
-  // Realtime: listen for partner diary changes
   useEffect(() => {
     if (!roomId || !me) return;
     const channel = supabase
@@ -97,27 +105,45 @@ const DiarySection = () => {
     setMyText(myEntry?.text || "");
     setBookOpen(false);
     setMode(targetMode);
+    setPopoverDay(null);
+  };
+
+  const handleDayTap = (day: number) => {
+    const date = `${currentYear}-${String(currentMonth + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+    const dayEntries = entries.filter((e) => e.date === date);
+    if (dayEntries.length > 0) {
+      setPopoverDay(popoverDay === day ? null : day);
+    } else {
+      openDay(day, "write");
+    }
   };
 
   const saveEntry = async () => {
     if (!selectedDate || !roomId || !me) return;
-    const existing = entries.find((e) => e.date === selectedDate && e.member_id === me.id);
-    if (existing) {
-      if (myText.trim()) {
-        await supabase.from("diary_entries").update({ text: myText.trim() }).eq("id", existing.id);
-        setEntries((prev) => prev.map((e) => e.id === existing.id ? { ...e, text: myText.trim() } : e));
-        toast({ title: "✨ Entry updated", description: "Your diary entry has been saved" });
-      } else {
-        await supabase.from("diary_entries").delete().eq("id", existing.id);
-        setEntries((prev) => prev.filter((e) => e.id !== existing.id));
-        toast({ title: "🗑️ Entry deleted", description: "Your diary entry has been removed" });
+    try {
+      const existing = entries.find((e) => e.date === selectedDate && e.member_id === me.id);
+      if (existing) {
+        if (myText.trim()) {
+          const { error } = await supabase.from("diary_entries").update({ text: myText.trim() }).eq("id", existing.id);
+          if (error) throw error;
+          setEntries((prev) => prev.map((e) => e.id === existing.id ? { ...e, text: myText.trim() } : e));
+          toast({ title: "✨ Entry updated", description: "Your diary entry has been saved" });
+        } else {
+          const { error } = await supabase.from("diary_entries").delete().eq("id", existing.id);
+          if (error) throw error;
+          setEntries((prev) => prev.filter((e) => e.id !== existing.id));
+          toast({ title: "🗑️ Entry deleted", description: "Your diary entry has been removed" });
+        }
+      } else if (myText.trim()) {
+        const { data, error } = await supabase.from("diary_entries")
+          .insert({ room_id: roomId, member_id: me.id, date: selectedDate, text: myText.trim() })
+          .select().single();
+        if (error) throw error;
+        if (data) setEntries((prev) => [...prev, { id: data.id, date: data.date, member_id: data.member_id, text: data.text }]);
+        toast({ title: "💌 Entry saved", description: `Your diary entry for ${selectedDate} has been saved` });
       }
-    } else if (myText.trim()) {
-      const { data } = await supabase.from("diary_entries")
-        .insert({ room_id: roomId, member_id: me.id, date: selectedDate, text: myText.trim() })
-        .select().single();
-      if (data) setEntries((prev) => [...prev, { id: data.id, date: data.date, member_id: data.member_id, text: data.text }]);
-      toast({ title: "💌 Entry saved", description: `Your diary entry for ${selectedDate} has been saved` });
+    } catch {
+      toast({ title: "Error", description: "Failed to save entry", variant: "destructive" });
     }
     setMode("calendar");
     setSelectedDate(null);
@@ -125,11 +151,16 @@ const DiarySection = () => {
 
   const deleteEntry = async () => {
     if (!selectedDate || !me) return;
-    const existing = entries.find((e) => e.date === selectedDate && e.member_id === me.id);
-    if (existing) {
-      await supabase.from("diary_entries").delete().eq("id", existing.id);
-      setEntries((prev) => prev.filter((e) => e.id !== existing.id));
-      toast({ title: "🗑️ Entry deleted", description: "Your diary entry has been removed" });
+    try {
+      const existing = entries.find((e) => e.date === selectedDate && e.member_id === me.id);
+      if (existing) {
+        const { error } = await supabase.from("diary_entries").delete().eq("id", existing.id);
+        if (error) throw error;
+        setEntries((prev) => prev.filter((e) => e.id !== existing.id));
+        toast({ title: "🗑️ Entry deleted", description: "Your diary entry has been removed" });
+      }
+    } catch {
+      toast({ title: "Error", description: "Failed to delete entry", variant: "destructive" });
     }
     setMyText("");
     setMode("calendar");
@@ -139,6 +170,14 @@ const DiarySection = () => {
   const backToCalendar = () => { setMode("calendar"); setSelectedDate(null); };
 
   const getEntryByMember = (date: string, memberId: string) => entries.find((e) => e.date === date && e.member_id === memberId);
+
+  if (loading) {
+    return (
+      <section className="relative z-10 py-24 px-4 max-w-3xl mx-auto text-center">
+        <p className="text-gold-accent font-italic italic animate-blink">Loading… ♡</p>
+      </section>
+    );
+  }
 
   return (
     <section id="our-diary" className="relative z-10 py-24 px-4 max-w-3xl mx-auto">
@@ -166,17 +205,35 @@ const DiarySection = () => {
               const dayEntries = getEntries(date);
               const isToday = date === today;
               const hasEntries = dayEntries.length > 0;
+              const isPopoverOpen = popoverDay === day;
               return (
-                <div key={day} className={`relative aspect-square flex flex-col items-center justify-center rounded text-sm font-body ${isToday ? "ring-1 ring-gold" : ""}`}>
-                  <span className="text-foreground text-xs mb-1">{day}</span>
-                  <div className="flex gap-0.5 mb-1">
-                    {dayEntries.some((e) => e.member_id === sheMember?.id) && <span className="w-1.5 h-1.5 rounded-full bg-rose" />}
-                    {dayEntries.some((e) => e.member_id === heMember?.id) && <span className="w-1.5 h-1.5 rounded-full bg-gold" />}
-                  </div>
-                  <div className="flex gap-1">
-                    <button onClick={() => openDay(day, "write")} className="text-[8px] text-gold-accent hover:text-cream-accent" title="Write">✎</button>
-                    {hasEntries && <button onClick={() => openDay(day, "read")} className="text-[8px] text-rose-accent hover:text-cream-accent" title="Read">📖</button>}
-                  </div>
+                <div key={day} className="relative">
+                  <button
+                    onClick={() => handleDayTap(day)}
+                    className={`w-full min-h-[44px] flex flex-col items-center justify-center rounded text-sm font-body transition-colors hover:bg-muted/20 ${isToday ? "ring-1 ring-gold" : ""}`}
+                  >
+                    <span className="text-foreground text-xs">{day}</span>
+                    <div className="flex gap-0.5 mt-0.5">
+                      {dayEntries.some((e) => e.member_id === sheMember?.id) && <span className="w-1.5 h-1.5 rounded-full bg-rose" />}
+                      {dayEntries.some((e) => e.member_id === heMember?.id) && <span className="w-1.5 h-1.5 rounded-full bg-gold" />}
+                    </div>
+                  </button>
+                  {isPopoverOpen && hasEntries && (
+                    <div className="absolute z-20 top-full left-1/2 -translate-x-1/2 mt-1 bg-card border border-border rounded-lg shadow-lg p-2 flex gap-2 min-w-[120px]">
+                      <button
+                        onClick={() => openDay(day, "write")}
+                        className="flex-1 text-xs font-body text-gold-accent hover:text-cream-accent py-1.5 px-2 rounded hover:bg-muted/30"
+                      >
+                        ✎ Write
+                      </button>
+                      <button
+                        onClick={() => openDay(day, "read")}
+                        className="flex-1 text-xs font-body text-rose-accent hover:text-cream-accent py-1.5 px-2 rounded hover:bg-muted/30"
+                      >
+                        📖 Read
+                      </button>
+                    </div>
+                  )}
                 </div>
               );
             })}
