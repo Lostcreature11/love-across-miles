@@ -11,7 +11,7 @@ const HeroSection = () => (
     </p>
     <div className="flex items-center gap-4 mt-16 animate-fade-up-delay-3">
       <span className="w-12 h-px bg-gold" />
-      <span className="text-gold-accent text-xs uppercase tracking-widest font-body animate-blink">scroll to begin</span>
+      <span className="text-gold-accent text-xs uppercase tracking-widest font-body animate-blink">Click here to see the magic</span>
       <span className="w-12 h-px bg-gold" />
     </div>
   </section>
